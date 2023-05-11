@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Site BuildName="Linux-arm-linux-gnueabihf-g++"
+	BuildStamp="20230206-1448-Experimental"
+	Name="navio"
+	Generator="ctest-3.13.4"
+	CompilerName="/usr/bin/arm-linux-gnueabihf-g++"
+	CompilerVersion="8.3.0"
+	OSName="Linux"
+	Hostname="navio"
+	OSRelease="4.19.127-emlid-v7+"
+	OSVersion="#1 SMP PREEMPT Mon Aug 24 19:50:57 MSK 2020"
+	OSPlatform="armv7l"
+	Is64Bits="0"
+	VendorString=""
+	VendorID="Unknown Manufacturer"
+	FamilyID="7"
+	ModelID="0"
+	ProcessorCacheSize="0"
+	NumberOfLogicalCPU="4"
+	NumberOfPhysicalCPU="1"
+	TotalVirtualMemory="99"
+	TotalPhysicalMemory="874"
+	LogicalProcessorsPerPhysical="4"
+	ProcessorClockFrequency="0"
+	>
+	<Testing>
+		<StartDateTime>Feb 06 14:48 GMT</StartDateTime>
+		<StartTestTime>1675694912</StartTestTime>
+		<TestList/>
+		<EndDateTime>Feb 06 14:48 GMT</EndDateTime>
+		<EndTestTime>1675694912</EndTestTime>
+		<ElapsedMinutes>0</ElapsedMinutes>
+	</Testing>
+</Site>
