@@ -1,4 +1,5 @@
 include_directories(${Quadson_SOURCE_DIR}/include)
+include_directories(${Quadson_SOURCE_DIR}/library/Navio)
 # SET(ENV{LD_LIBRARY_PATH} "/usr/local/lib:$ENV{LD_LIBRARY_PATH}")
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 

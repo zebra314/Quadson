@@ -1,32 +1,32 @@
 [
 {
-  "directory": "/home/pi/github/quadson/build/source",
-  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/home/pi/github/quadson/include  -g   -pthread -o CMakeFiles/quadson.dir/main.cpp.o -c /home/pi/github/quadson/source/main.cpp",
-  "file": "/home/pi/github/quadson/source/main.cpp"
+  "directory": "/home/pi/Desktop/quadbot/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++  -I/usr/include/eigen3 -I/home/pi/Desktop/quadbot/quadson/include -I/home/pi/Desktop/quadbot/quadson/library/Navio -g -pthread -o CMakeFiles/quadson.dir/main.cpp.o -c /home/pi/Desktop/quadbot/quadson/source/main.cpp",
+  "file": "/home/pi/Desktop/quadbot/quadson/source/main.cpp"
 },
 {
-  "directory": "/home/pi/github/quadson/build/source",
-  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/home/pi/github/quadson/include  -g   -pthread -o CMakeFiles/quadson.dir/quadson.cpp.o -c /home/pi/github/quadson/source/quadson.cpp",
-  "file": "/home/pi/github/quadson/source/quadson.cpp"
+  "directory": "/home/pi/Desktop/quadbot/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++  -I/usr/include/eigen3 -I/home/pi/Desktop/quadbot/quadson/include -I/home/pi/Desktop/quadbot/quadson/library/Navio -g -pthread -o CMakeFiles/quadson.dir/quadson.cpp.o -c /home/pi/Desktop/quadbot/quadson/source/quadson.cpp",
+  "file": "/home/pi/Desktop/quadbot/quadson/source/quadson.cpp"
 },
 {
-  "directory": "/home/pi/github/quadson/build/source",
-  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/home/pi/github/quadson/include  -g   -pthread -o CMakeFiles/quadson.dir/can_interface.cpp.o -c /home/pi/github/quadson/source/can_interface.cpp",
-  "file": "/home/pi/github/quadson/source/can_interface.cpp"
+  "directory": "/home/pi/Desktop/quadbot/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++  -I/usr/include/eigen3 -I/home/pi/Desktop/quadbot/quadson/include -I/home/pi/Desktop/quadbot/quadson/library/Navio -g -pthread -o CMakeFiles/quadson.dir/can_interface.cpp.o -c /home/pi/Desktop/quadbot/quadson/source/can_interface.cpp",
+  "file": "/home/pi/Desktop/quadbot/quadson/source/can_interface.cpp"
 },
 {
-  "directory": "/home/pi/github/quadson/build/source",
-  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/home/pi/github/quadson/include  -g   -pthread -o CMakeFiles/quadson.dir/actuator.cpp.o -c /home/pi/github/quadson/source/actuator.cpp",
-  "file": "/home/pi/github/quadson/source/actuator.cpp"
+  "directory": "/home/pi/Desktop/quadbot/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++  -I/usr/include/eigen3 -I/home/pi/Desktop/quadbot/quadson/include -I/home/pi/Desktop/quadbot/quadson/library/Navio -g -pthread -o CMakeFiles/quadson.dir/actuator.cpp.o -c /home/pi/Desktop/quadbot/quadson/source/actuator.cpp",
+  "file": "/home/pi/Desktop/quadbot/quadson/source/actuator.cpp"
 },
 {
-  "directory": "/home/pi/github/quadson/build/source",
-  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/home/pi/github/quadson/include  -g   -pthread -o CMakeFiles/quadson.dir/leg_group.cpp.o -c /home/pi/github/quadson/source/leg_group.cpp",
-  "file": "/home/pi/github/quadson/source/leg_group.cpp"
+  "directory": "/home/pi/Desktop/quadbot/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++  -I/usr/include/eigen3 -I/home/pi/Desktop/quadbot/quadson/include -I/home/pi/Desktop/quadbot/quadson/library/Navio -g -pthread -o CMakeFiles/quadson.dir/leg_group.cpp.o -c /home/pi/Desktop/quadbot/quadson/source/leg_group.cpp",
+  "file": "/home/pi/Desktop/quadbot/quadson/source/leg_group.cpp"
 },
 {
-  "directory": "/home/pi/github/quadson/build/source",
-  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/home/pi/github/quadson/include  -g   -pthread -o CMakeFiles/quadson.dir/AHRS.cpp.o -c /home/pi/github/quadson/source/AHRS.cpp",
-  "file": "/home/pi/github/quadson/source/AHRS.cpp"
+  "directory": "/home/pi/Desktop/quadbot/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++  -I/usr/include/eigen3 -I/home/pi/Desktop/quadbot/quadson/include -I/home/pi/Desktop/quadbot/quadson/library/Navio -g -pthread -o CMakeFiles/quadson.dir/AHRS.cpp.o -c /home/pi/Desktop/quadbot/quadson/source/AHRS.cpp",
+  "file": "/home/pi/Desktop/quadbot/quadson/source/AHRS.cpp"
 }
 ]
