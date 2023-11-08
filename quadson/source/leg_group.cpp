@@ -160,3 +160,107 @@ void matrixTest() {
   jacobian << x_grad, y_grad, z_grad;
   std::cout << jacobian;
 }
+
+// For 2D test
+Leg_group::Leg_group(Actuator *motorAlpha, Actuator *motorBeta) {
+  mMotorAlpha = motorAlpha;
+  mMotorBeta = motorBeta;
+}
+
+void Leg_group::torque_enable(int num){
+  this->mMotorAlpha->torque_enable(num); 
+  this->mMotorBeta->torque_enable(num);
+}
+
+bool Leg_group::reset_pos() {
+  if( !(mMotorAlpha->isZeroed() and mMotorBeta->isZeroed()) ) {
+    this->mMotorAlpha->control_mode(1);
+    this->mMotorBeta->control_mode(1);
+    this->mMotorAlpha->goal_velocity_dps(50);
+    this->mMotorBeta->goal_velocity_dps(50);
+    this->mMotorAlpha->check_zero_done();
+    this->mMotorBeta->check_zero_done();
+    return true; 
+  } else {
+    this->mMotorAlpha->goal_velocity_dps(0);
+    this->mMotorBeta->goal_velocity_dps(0);
+    this->mMotorAlpha->control_mode(0);
+    this->mMotorBeta->control_mode(0);
+    return false; // if complete reseting, break from reset while.
+  }
+}
+
+// For 2D test
+void Leg_group::moveTo_angle(float alpha, float beta){
+  // Protect the legs from rotate too much angle.
+  if(alpha > 180 or alpha < 0) {
+    std::cout<<"Target angle too high.\n";
+    return;
+  }
+  
+  if(beta > 180 or beta < 0) {
+    std::cout<<"Target angle too high.\n";
+    return;
+  }
+
+  // The zero position of the motor during reset is different from 
+  // the zero position in the derivation.
+  float motor_angle_1 =  90 - alpha;
+  float motor_angle_2 = 120 - beta;
+
+  // Tranfer motor_angle to can signal.
+  int can_signal_1 = int(motor_angle_1 * 32768 / 180);
+  int can_signal_2 = int(motor_angle_2 * 32768 / 180); 
+
+  this->mMotorAlpha->goal_position_deg(can_signal_1);
+  this->mMotorBeta->goal_position_deg(can_signal_2);
+}
+
+// For 2D test
+void Leg_group::moveTo_coordinate(float x, float y){
+  Eigen::Vector2f position = Eigen::Vector2f(x, y);
+  Eigen::Vector2f motor_angle = toe_pos2motor_angle(position);
+
+  float DEG_1 = motor_angle(0);
+  float DEG_2 = motor_angle(1);
+
+  moveTo_angle(DEG_1, DEG_2);
+}
+
+// For further information and plots, see the ppt in the connection below.
+// https://1drv.ms/p/s!AogEDeJiKy9qoiUlYLLq_KLRA7Cr?e=AXuawB
+Eigen::Vector2f Leg_group::toe_pos2motor_angle(Eigen::Vector2f position) {
+  float D = 8.16, L1 = 8, L2 = 13, L3 = 10, d = 8;
+  float Tx = position(0);
+  float Ty = position(1);
+
+  float x1 = sqrt(pow(Tx, 2) + pow(Ty, 2));
+
+  // Tx > 0, 0 < atan < PI / 2
+  // Tx < 0, 0 > atan > - PI / 2  
+  float alpha1 = atan( (-Ty) / Tx);
+  if (alpha1 < 0)
+    alpha1 += M_PI;
+  float beta1 = acos( (pow(x1, 2) + pow(L1, 2) - pow(L3+d, 2)) / (2 * x1 * L1));
+
+  float Qx = L1 * cos(alpha1 + beta1);
+  float Qy = -L1 * sin(alpha1 + beta1);
+  float Px = (Qx * d + Tx * L3) / (d + L3);
+  float Py = (Qy * d + Ty * L3) / (d + L3);
+
+  float x2 = sqrt(pow(D-Px, 2) + pow(Py, 2));
+
+  // D > Px, 0 < alpha2 < PI / 2
+  // D < Px, 0 > alpha2 > -PI / 2
+  float alpha2 = atan( (-Py) / (D-Px));
+  if (alpha2 < 0)
+    alpha2 += M_PI;
+  float beta2 = acos( (pow(x2, 2) + pow(L1, 2) - pow(L2, 2)) / (2 * x2 * L1));
+
+  // NOTICE
+  // The motor number in derivation is opposite to that in motor commands.
+  float motor_angle_1 = (alpha2 + beta2) * 180 / M_PI;
+  float motor_angle_2 = (alpha1 + beta1) * 180 / M_PI;
+
+  return Eigen::Vector2f(motor_angle_1, motor_angle_2);
+}

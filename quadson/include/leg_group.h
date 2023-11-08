@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 #include <iostream>
 #include <math.h>
+#include <unistd.h>
 
 #include "actuator.h"
 
@@ -26,9 +27,18 @@ private:
   Eigen::Vector3f ang;
   Eigen::Vector3f omg;
 
+  Eigen::Vector2f toe_pos2motor_angle(Eigen::Vector2f position);
+
 public:
   Leg_group();
   Leg_group(Actuator *motorAlpha, Actuator *mMtorBeta, Actuator *motorGamma);
   ~Leg_group();
+
+  // For 2D test
+  Leg_group(Actuator *motorAlpha, Actuator *mMtorBeta);
+  void torque_enable(int num);
+  bool reset_pos();
+  void moveTo_coordinate(float x, float y);
+  void moveTo_angle(float alpha, float beta);
 };
 #endif

@@ -11,6 +11,7 @@ public:
   ~Quadson();
   void update();
   void scan();
+  void moving_test();
 
 private:
   Can_interface *can_device;
@@ -23,5 +24,6 @@ private:
   void process_cmd();
 
   void get_actuator_echo(int);
+  void get_actuator_zero_state(int id, int value);
 };
 #endif // !INC_QUADSON_H
