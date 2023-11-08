@@ -4,12 +4,12 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/pi/Desktop/quadbot/quadson/source/AHRS.cpp" "/home/pi/Desktop/quadbot/quadson/build/source/CMakeFiles/quadson.dir/AHRS.cpp.o"
-  "/home/pi/Desktop/quadbot/quadson/source/actuator.cpp" "/home/pi/Desktop/quadbot/quadson/build/source/CMakeFiles/quadson.dir/actuator.cpp.o"
-  "/home/pi/Desktop/quadbot/quadson/source/can_interface.cpp" "/home/pi/Desktop/quadbot/quadson/build/source/CMakeFiles/quadson.dir/can_interface.cpp.o"
-  "/home/pi/Desktop/quadbot/quadson/source/leg_group.cpp" "/home/pi/Desktop/quadbot/quadson/build/source/CMakeFiles/quadson.dir/leg_group.cpp.o"
-  "/home/pi/Desktop/quadbot/quadson/source/main.cpp" "/home/pi/Desktop/quadbot/quadson/build/source/CMakeFiles/quadson.dir/main.cpp.o"
-  "/home/pi/Desktop/quadbot/quadson/source/quadson.cpp" "/home/pi/Desktop/quadbot/quadson/build/source/CMakeFiles/quadson.dir/quadson.cpp.o"
+  "/home/pi/github/quadson/source/AHRS.cpp" "/home/pi/github/quadson/build/source/CMakeFiles/quadson.dir/AHRS.cpp.o"
+  "/home/pi/github/quadson/source/actuator.cpp" "/home/pi/github/quadson/build/source/CMakeFiles/quadson.dir/actuator.cpp.o"
+  "/home/pi/github/quadson/source/can_interface.cpp" "/home/pi/github/quadson/build/source/CMakeFiles/quadson.dir/can_interface.cpp.o"
+  "/home/pi/github/quadson/source/leg_group.cpp" "/home/pi/github/quadson/build/source/CMakeFiles/quadson.dir/leg_group.cpp.o"
+  "/home/pi/github/quadson/source/main.cpp" "/home/pi/github/quadson/build/source/CMakeFiles/quadson.dir/main.cpp.o"
+  "/home/pi/github/quadson/source/quadson.cpp" "/home/pi/github/quadson/build/source/CMakeFiles/quadson.dir/quadson.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

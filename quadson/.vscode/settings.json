@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "random": "cpp",
-        "cmath": "cpp",
-        "complex": "cpp",
-        "core": "cpp"
-    },
-    "c-cpp-flylint.clang.includePaths": ["${workspaceRoot}/include"]
-}

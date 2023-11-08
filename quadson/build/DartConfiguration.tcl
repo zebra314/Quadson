@@ -4,8 +4,8 @@
 
 
 # Configuration directories and files
-SourceDirectory: /home/pi/Desktop/quadbot/quadson
-BuildDirectory: /home/pi/Desktop/quadbot/quadson/build
+SourceDirectory: /home/pi/github/quadson
+BuildDirectory: /home/pi/github/quadson/build
 
 # Where to place the cost data store
 CostDataFile: 
@@ -26,7 +26,7 @@ SubmitURL: http://
 NightlyStartTime: 00:00:00 EDT
 
 # Commands for the build/test/submit cycle
-ConfigureCommand: "/usr/bin/cmake" "/home/pi/Desktop/quadbot/quadson"
+ConfigureCommand: "/usr/bin/cmake" "/home/pi/github/quadson"
 MakeCommand: /usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}" -- -i
 DefaultCTestConfigurationType: Release
 
@@ -57,20 +57,18 @@ P4UpdateOptions:
 P4UpdateCustom: 
 
 # Generic update command
-UpdateCommand: 
+UpdateCommand: /usr/bin/git
 UpdateOptions: 
-UpdateType: 
+UpdateType: git
 
 # Compiler info
 Compiler: /usr/bin/arm-linux-gnueabihf-g++
-CompilerVersion: 10.2.1
+CompilerVersion: 8.3.0
 
 # Dynamic analysis (MemCheck)
 PurifyCommand: 
 ValgrindCommand: 
 ValgrindCommandOptions: 
-DrMemoryCommand: 
-DrMemoryCommandOptions: 
 MemoryCheckType: 
 MemoryCheckSanitizerOptions: 
 MemoryCheckCommand: MEMORYCHECK_COMMAND-NOTFOUND
