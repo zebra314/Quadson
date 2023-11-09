@@ -2,6 +2,14 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+#########
+# Units #
+#########
+
+# Length: m
+# Angle: rad
+# Velocity: m/s
+# Angular velocity: rad/s
 
 class Leg(object):
 	"""docstring for Leg"""
@@ -33,15 +41,15 @@ class Leg(object):
 		self.omega = [0, 0, 0]
 
 		# Gait parameters
-		body_velocity = 30  # mm/s
+		body_velocity = 0.03  # m/s
 		body_period = 4  # secs
 		delta_t = 0.1  # time with four legs touch the ground
-		lift_height = 40
+		lift_height = 0.04
 		leave_point = np.array([0, 0])
 		leave_velocity = np.array([-body_velocity, 0])
 		leg_period = body_period / 4 - delta_t
-		entry_point = np.array([body_velocity * (3 * leg_period + 4 * delta_t), 0])  # mm
-		entry_velocity = np.array([-body_velocity, 0])  # mm/s
+		entry_point = np.array([body_velocity * (3 * leg_period + 4 * delta_t), 0])
+		entry_velocity = np.array([-body_velocity, 0])
 
 		# 5th order bezier curve
 		self.p0 = leave_point
@@ -57,7 +65,7 @@ class Leg(object):
 				6 * self.p2[0] * t**2 * (1 - t)**2 +
 				4 * self.p3[0] * t**3 * (1 - t) +
 				1 * self.p4[0] * t**4
-		) * 0.1
+		)
 
 		y = (
 				1 * self.p0[1] * (1 - t)**4 +
@@ -65,7 +73,7 @@ class Leg(object):
 				6 * self.p2[1] * t**2 * (1 - t)**2 +
 				4 * self.p3[1] * t**3 * (1 - t) +
 				1 * self.p4[1] * t**4
-		) * 0.1
+		)
 
 		dx_dt = (
 				-4 * self.p0[0] * (1 - t)**3 +
@@ -73,7 +81,7 @@ class Leg(object):
 				12 * self.p2[0] * t * (1 - t)**2 +
 				12 * self.p3[0] * t**2 * (1 - t) -
 				4 * self.p4[0] * t**3
-		) * 0.1
+		)
 
 		dy_dt = (
 				-4 * self.p0[1] * (1 - t)**3 +
@@ -81,12 +89,12 @@ class Leg(object):
 				12 * self.p2[1] * t * (1 - t)**2 +
 				12 * self.p3[1] * t**2 * (1 - t) -
 				4 * self.p4[1] * t**3
-		) * 0.1
+		)
 
 		# Unify the gait coordinate to the leg coordinate
 		# Align the midpoint of the trajectory with the centerline of the two motors.
-		y = y - 16.54
-		x = x - 0.57
+		y = y - 0.1654
+		x = x - 0.0057
 
 		return np.array([[x, y], [dx_dt, dy_dt]])
 	
@@ -101,9 +109,6 @@ class Leg(object):
 		# Transform the leg position from the coordinate in real world 
 		# to the coordinate in derivation.
 		# (The real world x axis is reversed to the derivation x axis)
-		x = x / 100
-		y = y / 100
-		z = z / 100
 		x = -x + 0.08378
 
 		angle_m1 = math.atan2(y, -z)
@@ -190,9 +195,9 @@ class Leg(object):
 
 		# Transform the leg position from the coordinate in derivation 
 		# to the coordinate in real world.
-		# (The real world x axis is reversed to the derivation x axis)
 		x = -x + 0.08378
-		pos = 100 * np.array([x, y, z])
+		
+		pos = np.array([x, y, z])
 
 		return pos 
 
