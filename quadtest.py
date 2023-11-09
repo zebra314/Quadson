@@ -1,5 +1,7 @@
 import math
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 class Leg(object):
 	"""docstring for Leg"""
@@ -30,7 +32,64 @@ class Leg(object):
 		self.angle = [0, 0, 0]
 		self.omega = [0, 0, 0]
 
+		# Gait parameters
+		body_velocity = 30  # mm/s
+		body_period = 4  # secs
+		delta_t = 0.1  # time with four legs touch the ground
+		lift_height = 40
+		leave_point = np.array([0, 0])
+		leave_velocity = np.array([-body_velocity, 0])
+		leg_period = body_period / 4 - delta_t
+		entry_point = np.array([body_velocity * (3 * leg_period + 4 * delta_t), 0])  # mm
+		entry_velocity = np.array([-body_velocity, 0])  # mm/s
 
+		# 5th order bezier curve
+		self.p0 = leave_point
+		self.p1 = (leave_velocity * leg_period + 4 * leave_point) / 4
+		self.p2 = leave_point * 0.1 + entry_point * 0.9 + np.array([0, lift_height])
+		self.p3 = (-entry_velocity * leg_period + 4 * entry_point) / 4
+		self.p4 = entry_point
+
+	def leg_gait(self, t):
+		x = (
+				1 * self.p0[0] * (1 - t)**4 +
+				4 * self.p1[0] * t * (1 - t)**3 +
+				6 * self.p2[0] * t**2 * (1 - t)**2 +
+				4 * self.p3[0] * t**3 * (1 - t) +
+				1 * self.p4[0] * t**4
+		) * 0.1
+
+		y = (
+				1 * self.p0[1] * (1 - t)**4 +
+				4 * self.p1[1] * t * (1 - t)**3 +
+				6 * self.p2[1] * t**2 * (1 - t)**2 +
+				4 * self.p3[1] * t**3 * (1 - t) +
+				1 * self.p4[1] * t**4
+		) * 0.1
+
+		dx_dt = (
+				-4 * self.p0[0] * (1 - t)**3 +
+				4 * self.p1[0] * (1 - t)**3 +
+				12 * self.p2[0] * t * (1 - t)**2 +
+				12 * self.p3[0] * t**2 * (1 - t) -
+				4 * self.p4[0] * t**3
+		) * 0.1
+
+		dy_dt = (
+				-4 * self.p0[1] * (1 - t)**3 +
+				4 * self.p1[1] * (1 - t)**3 +
+				12 * self.p2[1] * t * (1 - t)**2 +
+				12 * self.p3[1] * t**2 * (1 - t) -
+				4 * self.p4[1] * t**3
+		) * 0.1
+
+		# Unify the gait coordinate to the leg coordinate
+		# Align the midpoint of the trajectory with the centerline of the two motors.
+		y = y - 16.54
+		x = x - 0.57
+
+		return np.array([[x, y], [dx_dt, dy_dt]])
+	
 	def calc_r(self, a, b):
 		return math.sqrt(a**2+b**2)
 
@@ -181,8 +240,33 @@ class Leg(object):
 		pass
 
 leg = Leg()
-rad = leg.leg_pos2rad([10.0, 0.0, -15.0])
-print(rad)
+# rad = leg.leg_pos2rad([5.78, 0.0, -15.0])
+# print(rad)
 
 # pos = leg.leg_rad2pos([0, math.radians(45), math.radians(45)])
 # print(pos)
+
+# #################### #
+# Plot gait trajectory #
+# #################### #
+
+# t_values = np.linspace(0, 1, 100)
+# xy_values = np.array([leg.leg_gait(t)[0] for t in t_values])
+# plt.plot(xy_values[:, 0], xy_values[:, 1])
+# plt.xlabel('x')
+# plt.ylabel('y')
+# plt.title('Plot of x and y from t=0 to t=1')
+# plt.show()
+
+# ################## #
+# Plot gait velocity #
+# ################## #
+
+# t_values = np.linspace(0, 1, 100)
+# xy_values = np.array([leg.leg_gait(t)[1] for t in t_values])
+# plt.plot(t_values, xy_values[:, 0])
+# plt.plot(t_values, xy_values[:, 1])
+# plt.xlabel('t')
+# plt.ylabel('velocity')
+# plt.title('Plot of x and y velocity from t=0 to t=1')
+# plt.show()
