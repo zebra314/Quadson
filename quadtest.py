@@ -67,7 +67,9 @@ class Leg(object):
 				1 * self.p4[0] * t**4
 		)
 
-		y = (
+		y = 0
+
+		z = (
 				1 * self.p0[1] * (1 - t)**4 +
 				4 * self.p1[1] * t * (1 - t)**3 +
 				6 * self.p2[1] * t**2 * (1 - t)**2 +
@@ -83,7 +85,9 @@ class Leg(object):
 				4 * self.p4[0] * t**3
 		)
 
-		dy_dt = (
+		dy_dt = 0
+
+		dz_dt = (
 				-4 * self.p0[1] * (1 - t)**3 +
 				4 * self.p1[1] * (1 - t)**3 +
 				12 * self.p2[1] * t * (1 - t)**2 +
@@ -91,12 +95,11 @@ class Leg(object):
 				4 * self.p4[1] * t**3
 		)
 
-		# Unify the gait coordinate to the leg coordinate
 		# Align the midpoint of the trajectory with the centerline of the two motors.
-		y = y - 0.1654
+		z = z - 0.1654
 		x = x - 0.0057
 
-		return np.array([[x, y], [dx_dt, dy_dt]])
+		return np.array([[x, y, z], [dx_dt, dy_dt, dz_dt]])
 	
 	def calc_r(self, a, b):
 		return math.sqrt(a**2+b**2)
@@ -106,9 +109,8 @@ class Leg(object):
 		y = pos[1]
 		z = pos[2]
 	
-		# Transform the leg position from the coordinate in real world 
-		# to the coordinate in derivation.
-		# (The real world x axis is reversed to the derivation x axis)
+		# Transform the leg position from the coordinate in real world
+		# to the coordinate in derivation
 		x = -x + 0.08378
 
 		angle_m1 = math.atan2(y, -z)
@@ -127,12 +129,9 @@ class Leg(object):
 		theta_m2 = math.atan2((self.motors_distance - r_m3p*math.sin(theta_m3p)), r_m3p*math.cos(theta_m3p))
 		angle_m2 = psi_m2 - theta_m2
 
-		# Transform the leg angle from the coordinate in derivation
-		# to the coordinate in real world.
-
-		print(math.degrees(angle_m1))
-		print(math.degrees(angle_m2))
-		print(math.degrees(angle_m3))
+		# print(math.degrees(angle_m1))
+		# print(math.degrees(angle_m2))
+		# print(math.degrees(angle_m3))
 
 		return np.array([angle_m1, angle_m2, angle_m3])
 
@@ -177,7 +176,6 @@ class Leg(object):
 		angle_m2 = angle[1]
 		angle_m3 = angle[2]
 		
-		# f = math.sqrt(self.arm_a**2 + self.motors_distance**2 - 2*self.arm_a*self.motors_distance*math.cos(angle_m2+math.pi/2))
 		f = math.sqrt(self.arm_a**2 + self.motors_distance**2 - 2*self.arm_a*self.motors_distance*math.cos(angle_m2+math.pi/2))
 		g = self.calc_r(-self.arm_a*math.sin(angle_m2)-(self.motors_distance+self.arm_c*math.sin(angle_m3)), 
 						-self.arm_a*math.cos(angle_m2)-(-self.arm_c*math.cos(angle_m3))) 
