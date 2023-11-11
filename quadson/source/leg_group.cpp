@@ -160,6 +160,13 @@ void matrixTest() {
   jacobian << x_grad, y_grad, z_grad;
   std::cout << jacobian;
 }
+
+Eigen::Matrix3f leg_vel2omega(Eigen::Matrix3f pos, Eigen::Matrix3f vel) {
+  Eigen::Matrix3f jacobian = leg_pos_grad(pos);
+  Eigen::Matrix3f omega = vel * jacobian;
+  return omega;
+}
+
 Eigen::Matrix2f Leg_group::leg_gait_status(float time) {
   Eigen::Matrix2f leave_point(0, 0);
   Eigen::Matrix2f leave_velocity(-BODY_VELOCITY, 0);
