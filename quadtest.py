@@ -246,30 +246,59 @@ leg = Leg()
 # rad = leg.leg_pos2rad([5.78, 0.0, -15.0])
 # print(rad)
 
-# pos = leg.leg_rad2pos([0, math.radians(45), math.radians(45)])
+# pos = leg.leg_rad2pos([0, math.radians(0), math.radians(89)])
 # print(pos)
 
-# #################### #
+pos = leg.leg_gait(0.5)
+print(pos)
+
+########################
 # Plot gait trajectory #
-# #################### #
+########################
 
 # t_values = np.linspace(0, 1, 100)
-# xy_values = np.array([leg.leg_gait(t)[0] for t in t_values])
-# plt.plot(xy_values[:, 0], xy_values[:, 1])
+# xyz_values = np.array([leg.leg_gait(t)[0] for t in t_values])
+# plt.plot(xyz_values[:, 0], xyz_values[:, 2])
 # plt.xlabel('x')
-# plt.ylabel('y')
-# plt.title('Plot of x and y from t=0 to t=1')
+# plt.ylabel('z')
+# plt.title('Plot of x and z from t=0 to t=1')
 # plt.show()
 
-# ################## #
+#######################################
+# Plot motor angle of gait trajectory #
+#######################################
+
+# t_values = np.linspace(0, 1, 100)
+# rad_values = np.array([leg.leg_pos2rad(leg.leg_gait(t)[0]) for t in t_values])
+# plt.plot(t_values, rad_values[:, 1])
+# plt.plot(t_values, rad_values[:, 2])
+# plt.xlabel('t')
+# plt.ylabel('rad')
+# plt.title('Plot of rad from t=0 to t=1')
+# plt.show()
+
+######################
 # Plot gait velocity #
-# ################## #
+######################
 
 # t_values = np.linspace(0, 1, 100)
 # xy_values = np.array([leg.leg_gait(t)[1] for t in t_values])
 # plt.plot(t_values, xy_values[:, 0])
 # plt.plot(t_values, xy_values[:, 1])
 # plt.xlabel('t')
-# plt.ylabel('velocity')
+# plt.ylabel('velocity m/s')
 # plt.title('Plot of x and y velocity from t=0 to t=1')
+# plt.show()
+
+##########################################
+# Plot motor velocity of gait trajectory #
+##########################################
+
+# t_values = np.linspace(0, 1, 100)
+# omega_values = np.array([leg.leg_vel2omega(leg.leg_gait(t)[0], leg.leg_gait(t)[1]) for t in t_values])
+# plt.plot(t_values, omega_values[:, 0, 1])
+# plt.plot(t_values, omega_values[:, 0, 2])
+# plt.xlabel('t')
+# plt.ylabel('omega rad/s')
+# plt.title('Plot of omega from t=0 to t=1')
 # plt.show()
