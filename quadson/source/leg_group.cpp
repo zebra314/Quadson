@@ -25,6 +25,10 @@ Eigen::Vector3f leg_pos2rad(Eigen::Vector3f position) {
   float y = position(1);
   float z = position(2);
 
+  // Transform the leg position from the coordinate in real world
+	// to the coordinate in derivation
+	x = -x + 0.08378
+
   float angle_m1 = atan2(y, -z);
   float r_m3 = CALC_R((MOTOR_DISTANCE - x), -CALC_R(y, z));
   float theta_m3 = atan2((MOTOR_DISTANCE - x), CALC_R(y, z));
@@ -77,6 +81,10 @@ Eigen::Vector3f leg_rad2pos(Eigen::Vector3f angle) {
              (ARM_D + ARM_E) * sin(psi - (M_PI / 2 - angle_m3));
   float z = zp * cos(angle_m1);
   float y = -zp * sin(angle_m1);
+
+  // Transform the leg position from the coordinate in derivation 
+	// to the coordinate in real world.
+	x = -x + 0.08378
 
 #ifdef DEBUG_LEGGROUP
 #print(x)
