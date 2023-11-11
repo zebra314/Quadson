@@ -16,6 +16,13 @@
 #define ARM_D 0.10
 #define ARM_E 0.066
 
+// Gait parameters
+#define BODY_VELOCITY 0.03
+#define BODY_PERIOD 4
+#define DELTA_T 0.1
+#define LIFT_HEIGHT 0.04
+#define LEG_PERIOD (BODY_PERIOD/4 - DELTA_T)
+
 class Leg_group {
 private:
   Actuator *mMotorAlpha;
@@ -28,7 +35,8 @@ private:
   Eigen::Vector3f omg;
 
   Eigen::Vector2f toe_pos2motor_angle(Eigen::Vector2f position);
-
+  Eigen::Matrix2f leg_gait_status(float time);
+  
 public:
   Leg_group();
   Leg_group(Actuator *motorAlpha, Actuator *mMtorBeta, Actuator *motorGamma);
