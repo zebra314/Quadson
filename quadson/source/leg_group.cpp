@@ -233,26 +233,27 @@ bool Leg_group::leg_reset_pos() {
 }
 
 void Leg_group::leg_move_ang(float angle_1, float angle_2, float angle_3){
+  // Set limits to the motor angles.
+  if( angle_1 > M_PI/2  or angle_1 < -M_PI/2 or 
+      angle_2 > M_PI or angle_2 < 0   or
+      angle_3 > M_PI or angle_3 < 0   ) {        
+    std::cout<<"Target angle too high.\n Abort\n";
     return;
   }
 
-  // The zero position of the motor during reset is different from 
-  // the zero position in the derivation.
-  float motor_angle_1 =  90 - alpha;
-  float motor_angle_2 = 120 - beta;
+  // Calibration the offset
+  float motor_angle_1 = 0;
+  float motor_angle_2 = 127 * M_PI / 180 - angle_2;
+  float motor_angle_3 = M_PI / 2 - angle_3;
 
-  // Tranfer motor_angle to can signal.
-  int can_signal_1 = int(motor_angle_1 * 32768 / 180);
-  int can_signal_2 = int(motor_angle_2 * 32768 / 180); 
+  int can_signal_1 = int(motor_angle_1 * 32768 / M_PI);
+  int can_signal_2 = int(motor_angle_2 * 32768 / M_PI);
+  int can_signal_3 = int(motor_angle_3 * 32768 / M_PI);
 
-  this->mMotorAlpha->goal_position_deg(can_signal_1);
+  this->mMotorAlpha->goal_position_deg(can_signal_3);
   this->mMotorBeta->goal_position_deg(can_signal_2);
+  // this->mMotorGamma->goal_position_deg(can_signal_1);
 }
-
-// For 2D test
-void Leg_group::moveTo_coordinate(float x, float y){
-  Eigen::Vector2f position = Eigen::Vector2f(x, y);
-  Eigen::Vector2f motor_angle = toe_pos2motor_angle(position);
 
   float DEG_1 = motor_angle(0);
   float DEG_2 = motor_angle(1);
