@@ -93,6 +93,45 @@ std::cout << "z" << z << '\n';
 }
 
 Eigen::Vector3f leg_pos2ang(Eigen::Vector3f position) {
+  float D = 0.0816, L1 = 0.08, L2 = 0.13, L3 = 0.10, d = 0.08;
+  float Tx = position(0);
+  float Ty = position(1);
+  float Tz = position(2);
+
+  float z_proj = sqrt(pow(Ty, 2) + pow(Tz, 2));
+  float x1 = sqrt(pow(Tx, 2) + pow(z_proj, 2));
+
+  // Ty > 0 => 0 < atan < PI / 2; Ty < 0 => 0 > atan > - PI / 2  
+  float alpha1 = atan(Ty / z_proj);
+
+  // Tx > 0 => 0 < atan < PI / 2; Tx < 0 => 0 > atan > - PI / 2  
+  float alpha2 = atan(z_proj / Tx);
+  if (alpha2 < 0) alpha2 += M_PI;
+  float beta2 = acos( (pow(x1, 2) + pow(L1, 2) - pow(L3+d, 2)) / (2 * x1 * L1));
+
+  float Qx = L1 * cos(alpha2 + beta2);
+  float Qz = -L1 * sin(alpha2 + beta2);
+  float Px = (Qx * d + Tx * L3) / (d + L3);
+  float Pz = (Qz * d + Tz * L3) / (d + L3);
+
+  float x2 = sqrt(pow(D-Px, 2) + pow(Pz, 2));
+
+  // D > Px => 0 < alpha2 < PI / 2; D < Px => 0 > alpha2 > -PI / 2
+  float alpha3 = atan((-Pz)/ (D-Px));
+  if (alpha3 < 0) alpha3 += M_PI;
+  float beta3 = acos( (pow(x2, 2) + pow(L1, 2) - pow(L2, 2)) / (2 * x2 * L1));
+
+  float motor_angle_1 = alpha1;
+  float motor_angle_2 = alpha2 + beta2;
+  float motor_angle_3 = alpha3 + beta3;
+
+#ifdef DEBUG_LEGGROUP
+std::cout << "motor_angle_1 : " << motor_angle_1 * 180 / M_PI << '\n';
+std::cout << "motor_angle_2 : " << motor_angle_2 * 180 / M_PI << '\n';
+std::cout << "motor_angle_3 : " << motor_angle_3 * 180 / M_PI << '\n';
+#endif
+  return Eigen::Vector3f(motor_angle_1, motor_angle_2, motor_angle_3);
+}
 
 Eigen::Matrix3f leg_pos_grad(Eigen::Vector3f position) {
   double shift = 1e-8;
