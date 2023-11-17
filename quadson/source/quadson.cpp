@@ -107,6 +107,21 @@ void Quadson::moving_test(){
   std::cout<<"---------- End Input test -----------"<<'\n';
   #endif
 
+  #ifdef Gait
+  std::cout<<"\n---------- Gait ----------\n\n";
+  sleep(2);
+  leg_test.torque_enable(1);
+  leg_test.leg_move_pos(-0.0057/100, 0, -16.54/100);
+  sleep(5);
+  for(int i = 0; i<100; i++){
+    update();
+    leg_test.leg_move_gait(static_cast<float>(i) / 100.0f);
+    usleep(100*1000);
+  }
+  leg_test.torque_enable(0);
+  std::cout<<"\n---------- End Gait ----------\n\n";
+  #endif 
+
   #ifdef Square
   std::cout<<"---------- Square route -----------"<<'\n';
   // Along -x direction
