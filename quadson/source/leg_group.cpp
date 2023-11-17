@@ -327,10 +327,23 @@ void Leg_group::leg_move_ang(float angle_1, float angle_2, float angle_3){
   // this->mMotorGamma->goal_position_deg(can_signal_1);
 }
 
-  float DEG_1 = motor_angle(0);
-  float DEG_2 = motor_angle(1);
+void Leg_group::leg_move_omg(float omega_1, float omega_2, float omega_3){
+  
+  float motor_omega_1 = omega_1;
+  float motor_omega_2 = omega_2;
+  float motor_omega_3 = omega_3;
 
-  moveTo_angle(DEG_1, DEG_2);
+  int can_signal_1 = int(motor_omega_1 * 160 / (2*M_PI));
+  int can_signal_2 = int(motor_omega_2 * 160 / (2*M_PI));
+  int can_signal_3 = int(motor_omega_3 * 160 / (2*M_PI));
+
+  std::cout<<"2 : "<<can_signal_2<<'\n';
+  std::cout<<"3 : "<<can_signal_3<<'\n';
+
+  this->mMotorAlpha->control_mode(1);
+  this->mMotorBeta->control_mode(1);
+  this->mMotorAlpha->goal_velocity_dps(can_signal_2);
+  this->mMotorBeta->goal_velocity_dps(can_signal_3);
 }
 
 void Leg_group::leg_move_pos(float x, float y, float z){
