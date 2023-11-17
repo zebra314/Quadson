@@ -243,33 +243,34 @@ void Leg_group::torque_enable(int num){
   this->mMotorBeta->torque_enable(num);
 }
 
-bool Leg_group::reset_pos() {
-  if( !(mMotorAlpha->isZeroed() and mMotorBeta->isZeroed()) ) {
-    this->mMotorAlpha->control_mode(1);
-    this->mMotorBeta->control_mode(1);
-    this->mMotorAlpha->goal_velocity_dps(50);
-    this->mMotorBeta->goal_velocity_dps(50);
-    this->mMotorAlpha->check_zero_done();
-    this->mMotorBeta->check_zero_done();
-    return true; 
-  } else {
-    this->mMotorAlpha->goal_velocity_dps(0);
-    this->mMotorBeta->goal_velocity_dps(0);
-    this->mMotorAlpha->control_mode(0);
-    this->mMotorBeta->control_mode(0);
-    return false; // if complete reseting, break from reset while.
-  }
-}
+bool Leg_group::leg_reset_pos() {
+  int check_list[3] = {0, 0, 1};
 
-// For 2D test
-void Leg_group::moveTo_angle(float alpha, float beta){
-  // Protect the legs from rotate too much angle.
-  if(alpha > 180 or alpha < 0) {
-    std::cout<<"Target angle too high.\n";
-    return;
+  this->mMotorAlpha->check_zero_done();  
+  this->mMotorBeta->check_zero_done();
+
+  if (this->mMotorAlpha->isZeroed() == 1){
+    this->mMotorAlpha->goal_velocity_dps(0);
+    this->mMotorAlpha->control_mode(0);
+    check_list[0] = 1;
+  } else if (this->mMotorAlpha->isZeroed() == 0){
+    this->mMotorAlpha->control_mode(1);
+    this->mMotorAlpha->goal_velocity_dps(55);
   }
   
-  if(beta > 180 or beta < 0) {
+  if(this->mMotorBeta->isZeroed() == 1){
+    this->mMotorBeta->goal_velocity_dps(0);
+    this->mMotorBeta->control_mode(0);
+    check_list[1] = 1;
+  } else if (this->mMotorBeta->isZeroed() == 0){
+    this->mMotorBeta->control_mode(1); 
+    this->mMotorBeta->goal_velocity_dps(55);
+  }
+
+  if(check_list[0] * check_list[1] * check_list[2] == 1) 
+    return true;
+  return false;
+}
     std::cout<<"Target angle too high.\n";
     return;
   }

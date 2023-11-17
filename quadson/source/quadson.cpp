@@ -80,29 +80,15 @@ void Quadson::moving_test(){
   // #define Triangle
   // #define Circle
 
-  // Reset the position
   #ifdef ZERO
-  std::cout<<"----------------Start Zero----------------\n";    
+  std::cout<<"\n####### Start Zero ######\n\n";    
   leg_test.torque_enable(1);
-  this->actuator[0]->control_mode(1);
-  this->actuator[1]->control_mode(1);
-  while (1){
-    this->actuator[0]->check_zero_done();  
-    this->actuator[1]->check_zero_done();     
+  while(!leg_test.leg_reset_pos()){
     update();
-    if (this->actuator[0]->isZeroed() == 1 and this->actuator[1]->isZeroed() == 1){
-      this->actuator[0]->goal_velocity_dps(0);
-      this->actuator[1]->goal_velocity_dps(0);
-      break;
-    }
-      
-    this->actuator[0]->goal_velocity_dps(30);
-    this->actuator[1]->goal_velocity_dps(30);
+    usleep(30*1000);
   }
-  sleep(1);
-  this->actuator[0]->control_mode(0);
-  this->actuator[1]->control_mode(0);
-  std::cout<<"----------Zero done------------"<<'\n';
+  leg_test.torque_enable(0);
+  std::cout<<"\n###### Zero done ######\n\n";
   #endif
 
   // Move to start position

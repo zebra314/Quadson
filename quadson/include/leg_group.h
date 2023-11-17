@@ -45,8 +45,7 @@ public:
   // For 2D test
   Leg_group(Actuator *motorAlpha, Actuator *mMtorBeta);
   void torque_enable(int num);
-  bool reset_pos();
-  void moveTo_coordinate(float x, float y);
-  void moveTo_angle(float alpha, float beta);
+  bool leg_reset_pos();
+  void leg_move_ang(float angle_1, float angle_2, float angle_3);
 };
 #endif
