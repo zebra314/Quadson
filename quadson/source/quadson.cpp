@@ -91,22 +91,16 @@ void Quadson::moving_test(){
   std::cout<<"\n###### Zero done ######\n\n";
   #endif
 
-  // Move to start position
-  // leg_test.torque_enable(1);
-  // leg_test.moveTo_coordinate(6,-17);
-  // sleep(5);
-  // leg_test.torque_enable(0);
-
   #ifdef Input
   std::cout<<"----------Input test-----------"<<'\n';
   sleep(3);
-  float x, y;
+  float x, z;
   while(1) {
     update();
     std::cout<<"Input x : "; std::cin>>x;
-    std::cout<<"Input y : "; std::cin>>y;
+    std::cout<<"Input z : "; std::cin>>z;
     leg_test.torque_enable(1);
-    leg_test.moveTo_coordinate(x,y);
+    leg_test.leg_move_pos(x/100,0,z/100);
     sleep(2);
     leg_test.torque_enable(0);
   }
