@@ -85,9 +85,9 @@ Eigen::Vector3f leg_ang2pos(Eigen::Vector3f angle) {
 	x = -x + 0.08378
 
 #ifdef DEBUG_LEGGROUP
-#print(x)
-#print(y)
-#print(z)
+std::cout << "x" << x << '\n';
+std::cout << "y" << y << '\n';
+std::cout << "z" << z << '\n';
 #endif
   return Eigen::Vector3f(x, y, z);
 }
@@ -116,10 +116,10 @@ Eigen::Matrix3f leg_pos_grad(Eigen::Vector3f position) {
   Eigen::Matrix3f jacobian;
   jacobian << x_grad, y_grad, z_grad;
 #ifdef DEBUG_LEGGROUP
-#print(x_grad)
-#print(y_grad)
-#print(z_grad)
-#print(jacobian)
+std::cout << "x_grad" << x_grad << '\n';
+std::cout << "y_grad" << y_grad << '\n';
+std::cout << "z_grad" << z_grad << '\n';
+std::cout << "jacobian" << jacobian << '\n';
 #endif
   return jacobian;
 }
@@ -152,10 +152,10 @@ Eigen::Matrix3f leg_ang_grad(Eigen::Vector3f angle) {
   Eigen::Matrix3f jacobian;
   jacobian << m1_grad, m2_grad, m3_grad;
 #ifdef DEBUG_LEGGROUP
-#print(m1_grad)
-#print(m2_grad)
-#print(m3_grad)
-#print(jacobian)
+std::cout << "m1_grad" << m1_grad << '\n';
+std::cout << "m2_grad" << m2_grad << '\n';
+std::cout << "m3_grad" << m3_grad << '\n';
+std::cout << "jacobian" << jacobian << '\n';
 #endif
   return jacobian;
 }
