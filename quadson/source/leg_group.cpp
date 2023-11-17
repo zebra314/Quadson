@@ -24,6 +24,39 @@ Leg_group::Leg_group(Actuator *motorAlpha, Actuator *motorBeta,
 
 Leg_group::~Leg_group() {}
 
+/* Breif introduction of the leg coordinate sys.
+/* Unit : 
+    Length : meter 
+    Angle  : rad
+
+    Z        Y
+    ↑      ↗ 
+    ∣   ／
+    |／
+    ------> X
+
+  motor_1
+    o
+          motor_2        motor_3
+            o--------------o、
+           /                 ˋ、    
+          /                   ˋ、  
+         o                     o
+          ˋ、                  /
+            ˋ、               / 
+              ˋ、            / 
+                ˋ、         /    
+                  ˋ、      /
+                    ˋ、   /
+                      ˋ、/
+                        o                  
+                          ˋ、
+                            ˋ、   
+                              ˋo (Tx, Ty, Tz)
+  ---------------Ground -----------------------------
+  For further information and plots, see the ppt in the connection below.
+  https://1drv.ms/p/s!AogEDeJiKy9qoiUlYLLq_KLRA7Cr?e=AXuawB */
+
 Eigen::Vector3f leg_ang2pos(Eigen::Vector3f angle) {
   float angle_m1 = angle(0);
   float angle_m2 = angle(1);
