@@ -371,4 +371,26 @@ void Leg_group::leg_move_vel(float x, float y, float z, float dx_dt, float dy_dt
   leg_move_omg(motor_omega_1, motor_omega_2, motor_omega_3);
 }
 
+void Leg_group::leg_move_gait(float time){
+  this->mMotorBeta->control_mode(1); 
+  this->mMotorAlpha->control_mode(1);
+
+  float t = time-(long)time;
+  
+  Eigen::Matrix3f gait_status = get_gait_status(t);
+  Eigen::Vector3f position = gait_status.col(0);
+  Eigen::Vector3f velocity = gait_status.col(1);
+
+  leg_move_vel( position.x(), position.y(), position.z(),
+                velocity.x(), velocity.y(), velocity.z());
+
+  // std::cout<<"---------------\n";
+  // std::cout<<"t :"<<t<<'\n';
+  // std::cout<<"dx/dt : "<<velocity.x()<<'\n';
+  // std::cout<<"dz/dt : "<<velocity.z()<<'\n';
+  // std::cout<<"---------------\n";
+
+  return;
+}
+
 }
