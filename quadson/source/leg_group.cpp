@@ -133,64 +133,66 @@ Eigen::Vector3f leg_vel2omg(Eigen::Vector3f position, Eigen::Vector3f velocity) 
   return omega;
 }
 
-Eigen::Matrix2f Leg_group::leg_gait_status(float time) {
-  Eigen::Matrix2f leave_point(0, 0);
-  Eigen::Matrix2f leave_velocity(-BODY_VELOCITY, 0);
-  Eigen::Matrix2f entry_point(BODY_VELOCITY * (3 * LEG_PERIOD + 4 * DELTA_T), 0);
-  Eigen::Matrix2f peak_point(0, LIFT_HEIGHT)
-  Eigen::Matrix2f entry_velocity(-BODY_VELOCITY, 0);
+Eigen::Matrix3f get_gait_status(float time) {
+  Eigen::Vector3f leave_point(0, 0, 0);
+  Eigen::Vector3f leave_velocity(-BODY_VELOCITY, 0, 0);
+  Eigen::Vector3f entry_point(BODY_VELOCITY * (3 * LEG_PERIOD + 4 * DELTA_T), 0, 0);
+  Eigen::Vector3f peak_point(0, 0, LIFT_HEIGHT);
+  Eigen::Vector3f entry_velocity(-BODY_VELOCITY, 0, 0);
 
   // 5th order bezier curve
-	Eigen::Matrix2f p0(leave_point);
-	Eigen::Matrix2f p1((leave_velocity * LEG_PERIOD + 4 * leave_point) / 4);
-	Eigen::Matrix2f p2(leave_point * 0.1 + entry_point * 0.9 + peak_point);
-	Eigen::Matrix2f p3((-entry_velocity * leg_period + 4 * entry_point) / 4);
-	Eigen::Matrix2f p4(entry_point);
+	Eigen::Vector3f p0 = leave_point;
+	Eigen::Vector3f p1 = (leave_velocity * LEG_PERIOD + 4 * leave_point) / 4;
+	Eigen::Vector3f p2 = leave_point * 0.1 + entry_point * 0.9 + peak_point;
+	Eigen::Vector3f p3 = (-1 * entry_velocity * LEG_PERIOD + 4 * entry_point) / 4;
+	Eigen::Vector3f p4 = entry_point;
 
   float t = time;
   float x = (
-    1 * p0[0] * pow((1 - t), 4) +
-    4 * p1[0] * t * pow((1 - t), 3) +
-    6 * p2[0] * pow(t, 2) * pow((1 - t), 2) +
-    4 * p3[0] * pow(t, 3) * (1 - t) +
-    1 * p4[0] * pow(t, 4) );
+    1 * p0.x() * pow((1 - t), 4) +
+    4 * p1.x() * t * pow((1 - t), 3) +
+    6 * p2.x() * pow(t, 2) * pow((1 - t), 2) +
+    4 * p3.x() * pow(t, 3) * (1 - t) +
+    1 * p4.x() * pow(t, 4) );
 
 	float y = 0;
 
 	float z = (
-    1 * p0[1] * pow((1 - t), 4) +
-    4 * p1[1] * t * pow((1 - t), 3) +
-    6 * p2[1] * pow(t, 2) * pow((1 - t), 2) +
-    4 * p3[1] * pow(t, 3) * (1 - t) +
-    1 * p4[1] * pow(t, 4) );
+    1 * p0.z() * pow((1 - t), 4) +
+    4 * p1.z() * t * pow((1 - t), 3) +
+    6 * p2.z() * pow(t, 2) * pow((1 - t), 2) +
+    4 * p3.z() * pow(t, 3) * (1 - t) +
+    1 * p4.z() * pow(t, 4) );
 
   float dx_dt = (
-   -4 * p0[0] * pow((1 - t), 3) +
-    4 * p1[0] * pow((1 - t), 3) +
-   12 * p2[0] * t * pow((1 - t), 2) +
-   12 * p3[0] * pow(t, 2) * (1 - t) -
-    4 * p4[0] * pow(t, 3));
+   -4 * p0.x() * pow((1 - t), 3) +
+    4 * p1.x() * pow((1 - t), 3) +
+   12 * p2.x() * t * pow((1 - t), 2) +
+   12 * p3.x() * pow(t, 2) * (1 - t) -
+    4 * p4.x() * pow(t, 3));
 
 	float dy_dt = 0;
 
 	float dz_dt = (
-   -4 * p0[1] * pow((1 - t), 3) +
-    4 * p1[1] * pow((1 - t), 3) +
-   12 * p2[1] * t * pow((1 - t), 2) +
-   12 * p3[1] * pow(t, 2) * (1 - t) -
-    4 * p4[1] * pow(t, 3) );
+   -4 * p0.z() * pow((1 - t), 3) +
+    4 * p1.z() * pow((1 - t), 3) +
+   12 * p2.z() * t * pow((1 - t), 2) +
+   12 * p3.z() * pow(t, 2) * (1 - t) -
+    4 * p4.z() * pow(t, 3) );
 
 	// Align the midpoint of the trajectory with the centerline of the two motors.
 	z = z - 0.1654;
 	x = x - 0.0057;
 
-  Eigen::Vector2f gait_pos(0, 0);
-  Eigen::Vector2f gait_vel(1, 0);
-  gait_status << gait_pos, gait_vel;
+  Eigen::Vector3f gait_pos(x, y, z);
+  Eigen::Vector3f gait_vel(dx_dt, dy_dt, dz_dt);
+  Eigen::Vector3f blank(0, 0, 0);
+  Eigen::Matrix3f gait_status;
+  gait_status << gait_pos, gait_vel, blank;
+
   return gait_status;
 }
 
-// For 2D test
 Leg_group::Leg_group(Actuator *motorAlpha, Actuator *motorBeta) {
   mMotorAlpha = motorAlpha;
   mMotorBeta = motorBeta;
