@@ -29,36 +29,36 @@ void Quadson::process_cmd() {
     printf("receive id: %d, cmd: %d, return value:%d\n", rec_cmd.id, rec_cmd.cmd, rec_cmd.value);
 
     switch (rec_cmd.cmd) {
-    case CAN_STDID_ECHO:
-      get_actuator_echo(rec_cmd.id);
-      break;
-    case CAN_STDID_ALL_PARAM:
-    case CAN_STDID_INFO_PARAM:
+      case CAN_STDID_ECHO:
+        get_actuator_echo(rec_cmd.id);
+        break;
+      case CAN_STDID_ALL_PARAM:
+      case CAN_STDID_INFO_PARAM:
 
-    case CAN_STDID_TORQUE_ENABLE:
-    case CAN_STDID_STATE_MACHINE:
-    case CAN_STDID_CONTROL_MODE:
+      case CAN_STDID_TORQUE_ENABLE:
+      case CAN_STDID_STATE_MACHINE:
+      case CAN_STDID_CONTROL_MODE:
 
-    case CAN_STDID_GOAL_REVOLUTION:
-    case CAN_STDID_GOAL_POSITION_DEG:
-    case CAN_STDID_GOAL_VELOCITY_DPS:
-    case CAN_STDID_GOAL_TORQUE_CURRENT_MA:
-    case CAN_STDID_GOAL_FLUX_CURRENT_MA:
-    case CAN_STDID_PRESENT_REVOLUTION:
-    case CAN_STDID_PRESENT_POSITION_DEG:
-    case CAN_STDID_PRESENT_VELOCITY_DPS:
-    case CAN_STDID_PRESENT_TORQUE_CURRENT_MA:
-    case CAN_STDID_PRESENT_FLUX_CURRENT_MA:
-    case CAN_STDID_PRESENT_VOLTAGE:
-    case CAN_STDID_PRESENT_TEMPERATURE:
-    case CAN_STDID_ZERO_DONE:
-      get_actuator_zero_state(rec_cmd.id, rec_cmd.value);
-
-    case CAN_STDID_GROUP0:
-    case CAN_STDID_GROUP1:
-    case CAN_STDID_GROUP2:
-    case CAN_STDID_GROUP3:
-      break;
+      case CAN_STDID_GOAL_REVOLUTION:
+      case CAN_STDID_GOAL_POSITION_DEG:
+      case CAN_STDID_GOAL_VELOCITY_DPS:
+      case CAN_STDID_GOAL_TORQUE_CURRENT_MA:
+      case CAN_STDID_GOAL_FLUX_CURRENT_MA:
+      case CAN_STDID_PRESENT_REVOLUTION:
+      case CAN_STDID_PRESENT_POSITION_DEG:
+      case CAN_STDID_PRESENT_VELOCITY_DPS:
+      case CAN_STDID_PRESENT_TORQUE_CURRENT_MA:
+      case CAN_STDID_PRESENT_FLUX_CURRENT_MA:
+      case CAN_STDID_PRESENT_VOLTAGE:
+      case CAN_STDID_PRESENT_TEMPERATURE:
+      case CAN_STDID_ZERO_DONE:
+        get_actuator_zero_state(rec_cmd.id, rec_cmd.value);
+        break;
+      case CAN_STDID_GROUP0:
+      case CAN_STDID_GROUP1:
+      case CAN_STDID_GROUP2:
+      case CAN_STDID_GROUP3:
+        break;
     }
   }
 }
