@@ -45,6 +45,7 @@ public:
   void leg_move_ang(float angle_1, float angle_2, float angle_3);
   void leg_move_omg(float omega_1, float omega_2, float omega_3);
   void leg_move_pos(float x, float y, float z);
+  void leg_move_vel(float x, float y, float z, float dx_dt, float dy_dt, float dz_dt);
   void leg_move_gait(float time);
 };
 #endif

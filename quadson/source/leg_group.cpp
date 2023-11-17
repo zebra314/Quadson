@@ -344,31 +344,16 @@ void Leg_group::leg_move_pos(float x, float y, float z){
   leg_move_ang(motor_angle_1, motor_angle_2, motor_angle_3);
 }
 
-  // Tx > 0, 0 < atan < PI / 2
-  // Tx < 0, 0 > atan > - PI / 2  
-  float alpha1 = atan( (-Ty) / Tx);
-  if (alpha1 < 0)
-    alpha1 += M_PI;
-  float beta1 = acos( (pow(x1, 2) + pow(L1, 2) - pow(L3+d, 2)) / (2 * x1 * L1));
+void Leg_group::leg_move_vel(float x, float y, float z, float dx_dt, float dy_dt, float dz_dt){
+  Eigen::Vector3f position = Eigen::Vector3f(x, y, z);
+  Eigen::Vector3f velocity = Eigen::Vector3f(dx_dt, dy_dt, dz_dt);
+  Eigen::Vector3f omega = leg_vel2omg(position, velocity);
 
-  float Qx = L1 * cos(alpha1 + beta1);
-  float Qy = -L1 * sin(alpha1 + beta1);
-  float Px = (Qx * d + Tx * L3) / (d + L3);
-  float Py = (Qy * d + Ty * L3) / (d + L3);
+  float motor_omega_1 = omega(0);
+  float motor_omega_2 = omega(1);
+  float motor_omega_3 = omega(2);
 
-  float x2 = sqrt(pow(D-Px, 2) + pow(Py, 2));
+  leg_move_omg(motor_omega_1, motor_omega_2, motor_omega_3);
+}
 
-  // D > Px, 0 < alpha2 < PI / 2
-  // D < Px, 0 > alpha2 > -PI / 2
-  float alpha2 = atan( (-Py) / (D-Px));
-  if (alpha2 < 0)
-    alpha2 += M_PI;
-  float beta2 = acos( (pow(x2, 2) + pow(L1, 2) - pow(L2, 2)) / (2 * x2 * L1));
-
-  // NOTICE
-  // The motor number in derivation is opposite to that in motor commands.
-  float motor_angle_1 = (alpha2 + beta2) * 180 / M_PI;
-  float motor_angle_2 = (alpha1 + beta1) * 180 / M_PI;
-
-  return Eigen::Vector2f(motor_angle_1, motor_angle_2);
 }
