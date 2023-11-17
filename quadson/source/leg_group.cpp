@@ -127,18 +127,9 @@ Eigen::Matrix3f leg_ang_grad(Eigen::Vector3f angle) {
   return jacobian;
 }
 
-void matrixTest() {
-  Eigen::Vector3f x_grad(0, 0, 0);
-  Eigen::Vector3f y_grad(1, 0, 0);
-  Eigen::Vector3f z_grad(0, 3, 0);
-  Eigen::Matrix3f jacobian;
-  jacobian << x_grad, y_grad, z_grad;
-  std::cout << jacobian;
-}
-
-Eigen::Matrix3f leg_vel2omega(Eigen::Matrix3f pos, Eigen::Matrix3f vel) {
-  Eigen::Matrix3f jacobian = leg_pos_grad(pos);
-  Eigen::Matrix3f omega = vel * jacobian;
+Eigen::Vector3f leg_vel2omg(Eigen::Vector3f position, Eigen::Vector3f velocity) {
+  Eigen::Matrix3f jacobian = leg_pos_grad(position);
+  Eigen::Vector3f omega = jacobian * velocity;
   return omega;
 }
 
