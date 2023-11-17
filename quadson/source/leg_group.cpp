@@ -322,6 +322,8 @@ void Leg_group::leg_move_ang(float angle_1, float angle_2, float angle_3){
   int can_signal_2 = int(motor_angle_2 * 32768 / M_PI);
   int can_signal_3 = int(motor_angle_3 * 32768 / M_PI);
 
+  this->mMotorAlpha->control_mode(0);
+  this->mMotorBeta->control_mode(0);
   this->mMotorAlpha->goal_position_deg(can_signal_3);
   this->mMotorBeta->goal_position_deg(can_signal_2);
   // this->mMotorGamma->goal_position_deg(can_signal_1);
