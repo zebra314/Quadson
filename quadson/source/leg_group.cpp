@@ -294,14 +294,16 @@ void Leg_group::leg_move_ang(float angle_1, float angle_2, float angle_3){
   moveTo_angle(DEG_1, DEG_2);
 }
 
-// For further information and plots, see the ppt in the connection below.
-// https://1drv.ms/p/s!AogEDeJiKy9qoiUlYLLq_KLRA7Cr?e=AXuawB
-Eigen::Vector2f Leg_group::toe_pos2motor_angle(Eigen::Vector2f position) {
-  float D = 8.16, L1 = 8, L2 = 13, L3 = 10, d = 8;
-  float Tx = position(0);
-  float Ty = position(1);
+void Leg_group::leg_move_pos(float x, float y, float z){
+  Eigen::Vector3f position = Eigen::Vector3f(x, y, z);
+  Eigen::Vector3f angle = leg_pos2ang(position);
 
-  float x1 = sqrt(pow(Tx, 2) + pow(Ty, 2));
+  float motor_angle_1 = angle(0);
+  float motor_angle_2 = angle(1);
+  float motor_angle_3 = angle(2);
+
+  leg_move_ang(motor_angle_1, motor_angle_2, motor_angle_3);
+}
 
   // Tx > 0, 0 < atan < PI / 2
   // Tx < 0, 0 > atan > - PI / 2  
