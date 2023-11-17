@@ -34,18 +34,17 @@ private:
   Eigen::Vector3f ang;
   Eigen::Vector3f omg;
 
-  Eigen::Vector2f toe_pos2motor_angle(Eigen::Vector2f position);
-  Eigen::Matrix2f leg_gait_status(float time);
-  
 public:
   Leg_group();
   Leg_group(Actuator *motorAlpha, Actuator *mMtorBeta, Actuator *motorGamma);
   ~Leg_group();
 
-  // For 2D test
   Leg_group(Actuator *motorAlpha, Actuator *mMtorBeta);
   void torque_enable(int num);
   bool leg_reset_pos();
   void leg_move_ang(float angle_1, float angle_2, float angle_3);
+  void leg_move_omg(float omega_1, float omega_2, float omega_3);
+  void leg_move_pos(float x, float y, float z);
+  void leg_move_gait(float time);
 };
 #endif
