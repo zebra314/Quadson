@@ -1,9 +1,13 @@
 #include "leg_group.h"
 
-Eigen::Vector3f leg_rad2pos(Eigen::Vector3f angle);
-Eigen::Vector3f leg_pos2rad(Eigen::Vector3f position);
+Eigen::Vector3f leg_ang2pos(Eigen::Vector3f angle);
+Eigen::Vector3f leg_pos2ang(Eigen::Vector3f position);
 Eigen::Matrix3f leg_pos_grad(Eigen::Vector3f position);
-Eigen::Matrix3f leg_angle_grad(Eigen::Vector3f angle);
+Eigen::Matrix3f leg_ang_grad(Eigen::Vector3f angle);
+Eigen::Vector3f leg_vel2omg(Eigen::Vector3f position, Eigen::Vector3f velocity);
+Eigen::Matrix3f get_gait_status(float time);
+
+// Eigen::Vector3f leg_pos2rad(Eigen::Vector3f position);
 
 Leg_group::Leg_group() {}
 Leg_group::Leg_group(Actuator *motorAlpha, Actuator *motorBeta,
@@ -20,46 +24,7 @@ Leg_group::Leg_group(Actuator *motorAlpha, Actuator *motorBeta,
 
 Leg_group::~Leg_group() {}
 
-Eigen::Vector3f leg_pos2rad(Eigen::Vector3f position) {
-  float x = position(0);
-  float y = position(1);
-  float z = position(2);
-
-  // Transform the leg position from the coordinate in real world
-	// to the coordinate in derivation
-	x = -x + 0.08378
-
-  float angle_m1 = atan2(y, -z);
-  float r_m3 = CALC_R((MOTOR_DISTANCE - x), -CALC_R(y, z));
-  float theta_m3 = atan2((MOTOR_DISTANCE - x), CALC_R(y, z));
-  float psi_m3 = acos((pow((ARM_D + ARM_E), 2) - pow(ARM_C, 2) - pow(r_m3, 2)) /
-                      (-2 * ARM_C * r_m3));
-  float angle_m3 = psi_m3 - theta_m3;
-  float beta_m3 =
-      acos((pow(r_m3, 2) - pow((ARM_D + ARM_E), 2) - pow(ARM_C, 2)) /
-           (-2 * ARM_C * (ARM_D + ARM_E)));
-  float r_m3p =
-      sqrt(pow(ARM_C, 2) + pow(ARM_D, 2) - 2 * ARM_C * ARM_D * cos(beta_m3));
-  float psi_m3p = acos((pow(ARM_D, 2) - pow(ARM_C, 2) - pow(r_m3p, 2)) /
-                       (-2 * ARM_C * r_m3p));
-  float theta_m3p = psi_m3p - angle_m3;
-  float r_m2 = CALC_R((MOTOR_DISTANCE - r_m3p * sin(theta_m3p)),
-                      -r_m3p * cos(theta_m3p));
-  float psi_m2 = acos((pow(ARM_B, 2) - pow(ARM_A, 2) - pow(r_m2, 2)) /
-                      (-2 * ARM_A * r_m2));
-  float theta_m2 =
-      atan2((MOTOR_DISTANCE - r_m3p * sin(theta_m3p)), r_m3p * cos(theta_m3p));
-  float angle_m2 = psi_m2 - theta_m2;
-
-#ifdef DEBUG_LEGGROUP
-  // # print(degrees(angle_m1))
-  // # print(degrees(angle_m2))
-  // # print(degrees(angle_m3))
-#endif
-  return Eigen::Vector3f(angle_m1, angle_m2, angle_m3);
-}
-
-Eigen::Vector3f leg_rad2pos(Eigen::Vector3f angle) {
+Eigen::Vector3f leg_ang2pos(Eigen::Vector3f angle) {
   float angle_m1 = angle(0);
   float angle_m2 = angle(1);
   float angle_m3 = angle(2);
@@ -94,6 +59,8 @@ Eigen::Vector3f leg_rad2pos(Eigen::Vector3f angle) {
   return Eigen::Vector3f(x, y, z);
 }
 
+Eigen::Vector3f leg_pos2ang(Eigen::Vector3f position) {
+
 Eigen::Matrix3f leg_pos_grad(Eigen::Vector3f position) {
   double shift = 1e-8;
 
@@ -101,16 +68,16 @@ Eigen::Matrix3f leg_pos_grad(Eigen::Vector3f position) {
   float y = position[1];
   float z = position[2];
 
-  Eigen::Vector3f x_plus = leg_pos2rad(Eigen::Vector3f(x + shift, y, z));
-  Eigen::Vector3f x_minus = leg_pos2rad(Eigen::Vector3f(x - shift, y, z));
+  Eigen::Vector3f x_plus = leg_pos2ang(Eigen::Vector3f(x + shift, y, z));
+  Eigen::Vector3f x_minus = leg_pos2ang(Eigen::Vector3f(x - shift, y, z));
   Eigen::Vector3f x_grad = (0.5 * (x_plus - x_minus)) / shift;
 
-  Eigen::Vector3f y_plus = leg_pos2rad(Eigen::Vector3f(x, y + shift, z));
-  Eigen::Vector3f y_minus = leg_pos2rad(Eigen::Vector3f(x, y - shift, z));
+  Eigen::Vector3f y_plus = leg_pos2ang(Eigen::Vector3f(x, y + shift, z));
+  Eigen::Vector3f y_minus = leg_pos2ang(Eigen::Vector3f(x, y - shift, z));
   Eigen::Vector3f y_grad = (0.5 * (y_plus - y_minus)) / shift;
 
-  Eigen::Vector3f z_plus = leg_pos2rad(Eigen::Vector3f(x, y, z + shift));
-  Eigen::Vector3f z_minus = leg_pos2rad(Eigen::Vector3f(x, y, z - shift));
+  Eigen::Vector3f z_plus = leg_pos2ang(Eigen::Vector3f(x, y, z + shift));
+  Eigen::Vector3f z_minus = leg_pos2ang(Eigen::Vector3f(x, y, z - shift));
   Eigen::Vector3f z_grad = (0.5 * (z_plus - z_minus)) / shift;
 
   Eigen::Matrix3f jacobian;
@@ -124,7 +91,7 @@ Eigen::Matrix3f leg_pos_grad(Eigen::Vector3f position) {
   return jacobian;
 }
 
-Eigen::Matrix3f leg_angle_grad(Eigen::Vector3f angle) {
+Eigen::Matrix3f leg_ang_grad(Eigen::Vector3f angle) {
   double shift = 1e-8;
 
   float angle_m1 = angle[0];
@@ -132,21 +99,21 @@ Eigen::Matrix3f leg_angle_grad(Eigen::Vector3f angle) {
   float angle_m3 = angle[2];
 
   Eigen::Vector3f m1_plus =
-      leg_rad2pos(Eigen::Vector3f(angle_m1 + shift, angle_m2, angle_m3));
+      leg_ang2pos(Eigen::Vector3f(angle_m1 + shift, angle_m2, angle_m3));
   Eigen::Vector3f m1_minus =
-      leg_rad2pos(Eigen::Vector3f(angle_m1 - shift, angle_m2, angle_m3));
+      leg_ang2pos(Eigen::Vector3f(angle_m1 - shift, angle_m2, angle_m3));
   Eigen::Vector3f m1_grad = (0.5 * (m1_plus - m1_minus)) / shift;
 
   Eigen::Vector3f m2_plus =
-      leg_rad2pos(Eigen::Vector3f(angle_m1, angle_m2 + shift, angle_m3));
+      leg_ang2pos(Eigen::Vector3f(angle_m1, angle_m2 + shift, angle_m3));
   Eigen::Vector3f m2_minus =
-      leg_rad2pos(Eigen::Vector3f(angle_m1, angle_m2 - shift, angle_m3));
+      leg_ang2pos(Eigen::Vector3f(angle_m1, angle_m2 - shift, angle_m3));
   Eigen::Vector3f m2_grad = (0.5 * (m2_plus - m2_minus)) / shift;
 
   Eigen::Vector3f m3_plus =
-      leg_rad2pos(Eigen::Vector3f(angle_m1, angle_m2, angle_m3 + shift));
+      leg_ang2pos(Eigen::Vector3f(angle_m1, angle_m2, angle_m3 + shift));
   Eigen::Vector3f m3_minus =
-      leg_rad2pos(Eigen::Vector3f(angle_m1, angle_m2, angle_m3 - shift));
+      leg_ang2pos(Eigen::Vector3f(angle_m1, angle_m2, angle_m3 - shift));
   Eigen::Vector3f m3_grad = (0.5 * (m3_plus - m3_minus)) / shift;
 
   Eigen::Matrix3f jacobian;
@@ -271,7 +238,8 @@ bool Leg_group::leg_reset_pos() {
     return true;
   return false;
 }
-    std::cout<<"Target angle too high.\n";
+
+void Leg_group::leg_move_ang(float angle_1, float angle_2, float angle_3){
     return;
   }
 
