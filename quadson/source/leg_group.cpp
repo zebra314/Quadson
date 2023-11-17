@@ -309,7 +309,7 @@ void Leg_group::leg_move_ang(float angle_1, float angle_2, float angle_3){
   if( angle_1 > M_PI/2  or angle_1 < -M_PI/2 or 
       angle_2 > M_PI or angle_2 < 0   or
       angle_3 > M_PI or angle_3 < 0   ) {        
-    std::cout<<"Target angle too high.\n Abort\n";
+    std::cout<<"Target angle too high. Abort\n";
     return;
   }
 
