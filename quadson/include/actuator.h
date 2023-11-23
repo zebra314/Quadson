@@ -17,6 +17,7 @@ private:
     int id;
     bool connected;
     bool zeroed;
+    int present_ang;
 
     actuator_param_t ac_param;
 public:
@@ -29,10 +30,14 @@ public:
     void zero(bool);
     bool isZeroed();
 
+    void angle(int angle);
+    int getAngle();
+
     void torque_enable(int num);
     void goal_revolution(int num);
     void goal_position_deg(int num);
     void goal_velocity_dps(int num);
+    void present_position_deg(void);
     void check_zero_done(void);
     void get_info_param(void);
     void get_all_param(void);

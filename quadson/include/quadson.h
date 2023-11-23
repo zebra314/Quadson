@@ -25,5 +25,6 @@ private:
 
   void get_actuator_echo(int);
   void get_actuator_zero_state(int id, int value);
+  void get_actuator_present_deg(int id, int value);
 };
 #endif // !INC_QUADSON_H

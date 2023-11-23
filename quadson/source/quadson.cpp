@@ -56,6 +56,8 @@ void Quadson::process_cmd() {
       case CAN_STDID_GOAL_FLUX_CURRENT_MA:
       case CAN_STDID_PRESENT_REVOLUTION:
       case CAN_STDID_PRESENT_POSITION_DEG:
+        get_actuator_present_deg(rec_cmd.id, rec_cmd.value);
+        break;
       case CAN_STDID_PRESENT_VELOCITY_DPS:
       case CAN_STDID_PRESENT_TORQUE_CURRENT_MA:
       case CAN_STDID_PRESENT_FLUX_CURRENT_MA:
@@ -81,6 +83,10 @@ void Quadson::get_actuator_zero_state(int id, int value) {
   this->actuator[id - 1]->zero(bool(value));
 }
 
+void Quadson::get_actuator_present_deg(int id, int value){
+  this->actuator[id -1]->angle(value);
+}
+
 void Quadson::moving_test(){
   Leg_group leg_test(this->actuator[0], this->actuator[1]);
 
@@ -103,6 +109,17 @@ void Quadson::moving_test(){
 
   #ifdef TEST
   print_progress("Start Test Angle Read");
+  int ang;
+  while(1){
+    update();
+    this->actuator[1]->present_position_deg();
+    ang = this->actuator[1]->getAngle();
+    std::cout<<'\n';
+    std::cout<<std::hex<<ang<<'\n'; 
+    std::cout<<std::dec<<ang<<'\n';
+    std::cout<<'\n';
+    usleep(50*1000);
+  }
   print_progress("End Test Angle Read");
   #endif
 
