@@ -391,6 +391,5 @@ void Leg_group::leg_move_gait(float time){
   // std::cout<<"---------------\n";
 
   return;
-}
 
 }
