@@ -3,6 +3,16 @@
 #include <unistd.h>
 #include <math.h>
 
+void print_progress(std::string progress){
+  std::cout<<"\n+";
+  for(int i = 0; i<progress.length()+2; i++)
+    std::cout<<'-';
+  std::cout<<"+\n| "<<progress<<" |\n+";
+  for(int i = 0; i<progress.length()+2; i++)
+    std::cout<<'-';
+  std::cout<<"+\n\n";
+}
+
 Quadson::Quadson(Can_interface *can_device) {
   this->can_device = can_device;
   can_device->can_init();
@@ -74,25 +84,30 @@ void Quadson::get_actuator_zero_state(int id, int value) {
 void Quadson::moving_test(){
   Leg_group leg_test(this->actuator[0], this->actuator[1]);
 
-  // #define ZERO
+  #define ZERO
   // #define Input
-  // #define Square
+  #define GAIT
   // #define Triangle
   // #define Circle
 
   #ifdef ZERO
-  std::cout<<"\n####### Start Zero ######\n\n";    
+  print_progress("Start Zero");
   leg_test.torque_enable(1);
   while(!leg_test.leg_reset_pos()){
     update();
     usleep(30*1000);
   }
   leg_test.torque_enable(0);
-  std::cout<<"\n###### Zero done ######\n\n";
+  print_progress("End Zero");
+  #endif
+
+  #ifdef TEST
+  print_progress("Start Test Angle Read");
+  print_progress("End Test Angle Read");
   #endif
 
   #ifdef Input
-  std::cout<<"----------Input test-----------"<<'\n';
+  print_progress("Start Input test");
   sleep(3);
   float x, z;
   while(1) {
@@ -104,11 +119,11 @@ void Quadson::moving_test(){
     sleep(2);
     leg_test.torque_enable(0);
   }
-  std::cout<<"---------- End Input test -----------"<<'\n';
+  print_progress("End Input test");
   #endif
 
-  #ifdef Gait
-  std::cout<<"\n---------- Gait ----------\n\n";
+  #ifdef GAIT
+  print_progress("Start Gait");
   sleep(2);
   leg_test.torque_enable(1);
   leg_test.leg_move_pos(-0.0057/100, 0, -16.54/100);
@@ -119,124 +134,7 @@ void Quadson::moving_test(){
     usleep(100*1000);
   }
   leg_test.torque_enable(0);
-  std::cout<<"\n---------- End Gait ----------\n\n";
-  #endif 
-
-  #ifdef Square
-  std::cout<<"---------- Square route -----------"<<'\n';
-  // Along -x direction
-  float toe_X = 14;
-  float toe_Y = -14;
-  while(1) {
-    if(toe_X <= 3.0)
-      break;
-    toe_X-=0.5;  
-    leg_test.torque_enable(1);
-    if(toe_X == 13.5) {
-      leg_test.moveTo_coordinate(toe_X, toe_Y);
-      sleep(2);
-    }
-    leg_test.moveTo_coordinate(toe_X, toe_Y);
-    usleep(80*1000);
-  }
-
-  // Along -y direction
-  while(1) {
-    if(toe_Y <= -20.0)
-      break;
-    toe_Y-=0.5;  
-    leg_test.torque_enable(1);
-    leg_test.moveTo_coordinate(toe_X, toe_Y);
-    usleep(80*1000);
-  }
-
-  while(1) {
-    if(toe_X >= 14.0)
-      break;
-    toe_X+=0.5;  
-    leg_test.torque_enable(1);
-    leg_test.moveTo_coordinate(toe_X, toe_Y);
-    usleep(80*1000);
-  }
-
-  // Along y direction
-  while(1) {
-    if(toe_Y >= -14.0)
-      break;
-    toe_Y+=0.5;  
-    leg_test.torque_enable(1);
-    leg_test.moveTo_coordinate(toe_X, toe_Y);
-    usleep(80*1000);
-  }
-  std::cout<<"---------- End Square route -----------"<<'\n';
-  #endif
-
-  #ifdef Triangle
-  std::cout<<"---------- Triangle route -----------"<<'\n';
-
-  float toe_X = 14;
-  float toe_Y = -14;
-
-  // (14, -14) -> (7,-14) 
-  while(1) {
-    if(toe_X <= 7)
-      break;
-    toe_X-=0.5;
-    leg_test.torque_enable(1);
-    if(toe_X == 13.5) {
-      sleep(2);
-    }
-    leg_test.moveTo_coordinate(toe_X, toe_Y);
-    usleep(80*1000);
-  }
-
-  // (7, -14) -> (0, -20)
-  while(1) {
-    if(toe_X <=0 and toe_Y <=-20 )
-      break;
-    toe_X-=0.38;  
-    toe_Y-=0.325;
-    leg_test.torque_enable(1);
-    leg_test.moveTo_coordinate(toe_X, toe_Y);
-    usleep(80*1000);
-  }
-
-  // (0, -20) -> (14, -14)
-  while(1) {
-    if(toe_X >=14 and toe_Y >=-14 )
-      break;
-    toe_X+=0.46;  
-    toe_Y+=0.197;
-    leg_test.torque_enable(1);
-    leg_test.moveTo_coordinate(toe_X, toe_Y);
-    usleep(80*1000);
-  }
-  std::cout<<"---------- End Triangle route -----------"<<'\n';
-  #endif
-
-  #ifdef Circle
-  std::cout<<"---------- Circle route -----------"<<'\n';
-  float ox = 6;
-  float oy = -17;
-  float r = 3;
-  float x, y;
-  double theta = 0;
-  sleep(2);
-  while(1){  
-    theta += 3;
-    x = ox + r * float( cos(theta * M_PI / 180) );
-    y = oy + r * float( sin(theta * M_PI / 180) );
-
-    x = std::round(x * 100) / 100;
-    y = std::round(y * 100) / 100;
-
-    std::cout<<"("<<x<<", "<<y<<")\n";
-    leg_test.torque_enable(1);
-    leg_test.moveTo_coordinate(x, y);
-    usleep(80*1000);
-    if(theta == 1440) break;
-  }
-  std::cout<<"---------- End Circle route -----------"<<'\n';
+  print_progress("End Gait");
   #endif 
 
   leg_test.torque_enable(0);
