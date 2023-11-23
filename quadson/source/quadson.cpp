@@ -93,8 +93,6 @@ void Quadson::moving_test(){
   #define ZERO
   // #define Input
   #define GAIT
-  // #define Triangle
-  // #define Circle
 
   #ifdef ZERO
   print_progress("Start Zero");
@@ -154,5 +152,4 @@ void Quadson::moving_test(){
   print_progress("End Gait");
   #endif 
 
-  leg_test.torque_enable(0);
 }
