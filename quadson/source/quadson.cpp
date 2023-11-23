@@ -142,7 +142,12 @@ void Quadson::moving_test(){
   sleep(2);
   leg_test.torque_enable(1);
   leg_test.leg_move_pos(-0.0057/100, 0, -16.54/100);
-  sleep(5);
+  sleep(2);
+  
+  std::cout << "Press Enter to continue...\n";
+  std::string line;
+  std::getline(std::cin, line);
+
   for(int i = 0; i<100; i++){
     update();
     leg_test.leg_move_gait(static_cast<float>(i) / 100.0f);
