@@ -20,7 +20,7 @@
 #define BODY_VELOCITY 0.03
 #define BODY_PERIOD 4
 #define DELTA_T 0.1
-#define LIFT_HEIGHT 0.04
+#define LIFT_HEIGHT 0.065
 #define LEG_PERIOD (BODY_PERIOD/4 - DELTA_T)
 
 class Leg_group {
@@ -47,5 +47,8 @@ public:
   void leg_move_pos(float x, float y, float z);
   void leg_move_vel(float x, float y, float z, float dx_dt, float dy_dt, float dz_dt);
   void leg_move_gait(float time);
+  
+  Eigen::Vector3f leg_get_ang();
+  Eigen::Vector3f leg_get_pos();
 };
 #endif

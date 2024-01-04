@@ -91,6 +91,7 @@ void Quadson::moving_test(){
   Leg_group leg_test(this->actuator[0], this->actuator[1]);
 
   #define ZERO
+  // #define TEST
   // #define Input
   #define GAIT
 
@@ -142,17 +143,32 @@ void Quadson::moving_test(){
   sleep(2);
   leg_test.torque_enable(1);
   leg_test.leg_move_pos(-0.0057/100, 0, -16.54/100);
-  sleep(2);
+  sleep(5);
   
   std::cout << "Press Enter to continue...\n";
   std::string line;
   std::getline(std::cin, line);
 
-  for(int i = 0; i<100; i++){
-    update();
-    leg_test.leg_move_gait(static_cast<float>(i) / 100.0f);
-    usleep(100*1000);
+  for(int time = 0; time<5; time++){
+
+    // Curve section
+    for(int i = 0; i<100; i++){
+      update();
+      leg_test.leg_move_gait(static_cast<float>(i) / 100.0f);
+      usleep(10*1000);
+    }
+
+    // Horzion section
+    for(int i = 0; i<100; i++){
+      update();
+      float x = 0.0875561 - (0.0875561/100) * i;
+      float y = 0;
+      float z = -0.165362;
+      leg_test.leg_move_pos(x,y,z);
+      usleep(10*1000);
+    }
   }
+
   leg_test.torque_enable(0);
   print_progress("End Gait");
   #endif 

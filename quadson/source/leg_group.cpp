@@ -82,7 +82,7 @@ Eigen::Vector3f leg_ang2pos(Eigen::Vector3f angle) {
 
   // Transform the leg position from the coordinate in derivation 
 	// to the coordinate in real world.
-	x = -x + 0.08378
+	x = -x + 0.08378;
 
 #ifdef DEBUG_LEGGROUP
 std::cout << "x" << x << '\n';
@@ -335,17 +335,14 @@ void Leg_group::leg_move_omg(float omega_1, float omega_2, float omega_3){
   float motor_omega_2 = omega_2;
   float motor_omega_3 = omega_3;
 
-  int can_signal_1 = int(motor_omega_1 * 160 / (2*M_PI));
-  int can_signal_2 = int(motor_omega_2 * 160 / (2*M_PI));
-  int can_signal_3 = int(motor_omega_3 * 160 / (2*M_PI));
-
-  std::cout<<"2 : "<<can_signal_2<<'\n';
-  std::cout<<"3 : "<<can_signal_3<<'\n';
+  int can_signal_1 = int(motor_omega_1 * 450 / M_PI);
+  int can_signal_2 = int(motor_omega_2 * 450 / M_PI);
+  int can_signal_3 = int(motor_omega_3 * 450 / M_PI);
 
   this->mMotorAlpha->control_mode(1);
   this->mMotorBeta->control_mode(1);
-  this->mMotorAlpha->goal_velocity_dps(can_signal_2);
-  this->mMotorBeta->goal_velocity_dps(can_signal_3);
+  this->mMotorAlpha->goal_velocity_dps(can_signal_3);
+  this->mMotorBeta->goal_velocity_dps(can_signal_2);
 }
 
 void Leg_group::leg_move_pos(float x, float y, float z){
@@ -372,7 +369,7 @@ void Leg_group::leg_move_vel(float x, float y, float z, float dx_dt, float dy_dt
 }
 
 void Leg_group::leg_move_gait(float time){
-  this->mMotorBeta->control_mode(1); 
+  this->mMotorBeta->control_mode(1);
   this->mMotorAlpha->control_mode(1);
 
   float t = time-(long)time;
@@ -381,15 +378,37 @@ void Leg_group::leg_move_gait(float time){
   Eigen::Vector3f position = gait_status.col(0);
   Eigen::Vector3f velocity = gait_status.col(1);
 
-  leg_move_vel( position.x(), position.y(), position.z(),
-                velocity.x(), velocity.y(), velocity.z());
+  // leg_move_vel( position.x(), position.y(), position.z(),
+  //               velocity.x(), velocity.y(), velocity.z());
 
-  // std::cout<<"---------------\n";
-  // std::cout<<"t :"<<t<<'\n';
-  // std::cout<<"dx/dt : "<<velocity.x()<<'\n';
-  // std::cout<<"dz/dt : "<<velocity.z()<<'\n';
-  // std::cout<<"---------------\n";
+  leg_move_pos( position.x(), position.y(), position.z() );
+
+  std::cout<<"---------------\n";
+  std::cout<<"t :"<<t<<'\n';
+  std::cout<<"x : "<<position.x()<<'\n';
+  std::cout<<"z : "<<position.z()<<'\n';
+  std::cout<<"dx/dt : "<<velocity.x()<<'\n';
+  std::cout<<"dz/dt : "<<velocity.z()<<'\n';
+  std::cout<<"---------------\n";
 
   return;
+}
 
+Eigen::Vector3f Leg_group::leg_get_ang(){
+  this->mMotorAlpha->present_position_deg();
+  this->mMotorBeta->present_position_deg();
+  // this->mMotorGamma->present_position_deg();
+
+  // float angle_1 = this->mMotorGamma->getAngle();
+  float angle_2 = this->mMotorBeta->getAngle();
+  float angle_3 = this->mMotorAlpha->getAngle();
+
+  return Eigen::Vector3f(0, angle_2, angle_3);
+}
+
+Eigen::Vector3f Leg_group::leg_get_pos(){
+  Eigen::Vector3f angle = leg_get_ang();
+  Eigen::Vector3f pose = leg_ang2pos(angle);
+
+  return pose;
 }
