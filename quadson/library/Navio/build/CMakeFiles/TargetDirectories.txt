@@ -1,7 +1,0 @@
-/home/pi/github/quadson/library/Navio/build/CMakeFiles/install/strip.dir
-/home/pi/github/quadson/library/Navio/build/CMakeFiles/edit_cache.dir
-/home/pi/github/quadson/library/Navio/build/CMakeFiles/navio2.dir
-/home/pi/github/quadson/library/Navio/build/CMakeFiles/rebuild_cache.dir
-/home/pi/github/quadson/library/Navio/build/CMakeFiles/list_install_components.dir
-/home/pi/github/quadson/library/Navio/build/CMakeFiles/install.dir
-/home/pi/github/quadson/library/Navio/build/CMakeFiles/install/local.dir
