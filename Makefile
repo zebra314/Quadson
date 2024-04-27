@@ -22,4 +22,4 @@ Install:
 	pip install -r requirements.txt # Install
 
 sim:
-	source venv/bin/activate # Activate
+	source venv/bin/activate && python3 ./python_scripts/sim.py
