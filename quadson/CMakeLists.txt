@@ -4,10 +4,12 @@ project(Quadson VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-find_package(Eigen3 REQUIRED)
-
-
-include_directories(${EIGEN3_INCLUDE_DIRS})
+find_path(EIGEN3_INCLUDE_DIRS "Eigen" paths "/usr/include" "/usr/local/include" path_suffixes "eigen3")
+message(${EIGEN3_INCLUDE_DIRS})
+if ( NOT EIGEN3_INCLUDE_DIRS )
+    message(FATAL_ERROR "CMake variable EIGEN3_INCLUDE_DIRS not found.")
+endif()
+include_directories ( "${EIGEN3_INCLUDE_DIRS}" )
 
 add_subdirectory(source)
 
