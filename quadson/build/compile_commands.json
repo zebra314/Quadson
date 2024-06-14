@@ -1,0 +1,32 @@
+[
+{
+  "directory": "/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/quadson/include -I/quadson/library/Navio  -g   -pthread -o CMakeFiles/quadson.dir/main.cpp.o -c /quadson/source/main.cpp",
+  "file": "/quadson/source/main.cpp"
+},
+{
+  "directory": "/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/quadson/include -I/quadson/library/Navio  -g   -pthread -o CMakeFiles/quadson.dir/quadson.cpp.o -c /quadson/source/quadson.cpp",
+  "file": "/quadson/source/quadson.cpp"
+},
+{
+  "directory": "/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/quadson/include -I/quadson/library/Navio  -g   -pthread -o CMakeFiles/quadson.dir/can_interface.cpp.o -c /quadson/source/can_interface.cpp",
+  "file": "/quadson/source/can_interface.cpp"
+},
+{
+  "directory": "/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/quadson/include -I/quadson/library/Navio  -g   -pthread -o CMakeFiles/quadson.dir/actuator.cpp.o -c /quadson/source/actuator.cpp",
+  "file": "/quadson/source/actuator.cpp"
+},
+{
+  "directory": "/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/quadson/include -I/quadson/library/Navio  -g   -pthread -o CMakeFiles/quadson.dir/leg_group.cpp.o -c /quadson/source/leg_group.cpp",
+  "file": "/quadson/source/leg_group.cpp"
+},
+{
+  "directory": "/quadson/build/source",
+  "command": "/usr/bin/arm-linux-gnueabihf-g++   -I/usr/include/eigen3 -I/quadson/include -I/quadson/library/Navio  -g   -pthread -o CMakeFiles/quadson.dir/AHRS.cpp.o -c /quadson/source/AHRS.cpp",
+  "file": "/quadson/source/AHRS.cpp"
+}
+]
