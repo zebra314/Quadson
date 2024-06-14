@@ -6,6 +6,8 @@ CMakeFiles/
 quadson/build/Makefile
 Testing/
 source/
-CTestTestfile.cmake
 .cmake/
 DartConfiguration.tcl
+CTestTestfile.cmake
+CMakeCache.txt
+cmake_install.cmake
