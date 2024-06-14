@@ -4,21 +4,26 @@
      For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
 <robot
   name="quadbot">
+  <!-- <link name="dummy"></link>
+  <joint name="dummy" type="fixed">
+    <parent link="dummy"></parent>
+    <child link="base_link"></child>
+  </joint> -->
   <link
     name="base_link">
     <inertial>
       <origin
-        xyz="0.015391 0.18702 -1.9815E-06"
+        xyz="-0.00387120244352494 0.18652191683355 -6.56418141173892E-16"
         rpy="0 0 0" />
       <mass
-        value="1.1069" />
+        value="0.996322261989855" />
       <inertia
-        ixx="0.0039434"
-        ixy="-2.2459E-12"
-        ixz="2.0626E-09"
-        iyy="0.0047314"
-        iyz="-1.5796E-06"
-        izz="0.0039285" />
+        ixx="0.00378711359510183"
+        ixy="-8.34892270163617E-16"
+        ixz="-2.92467752920497E-19"
+        iyy="0.00467886630089355"
+        iyz="-1.452 89130392194E-10"
+        izz="0.00381803359998961" />
     </inertial>
     <visual>
       <origin
@@ -31,7 +36,7 @@
       <material
         name="">
         <color
-          rgba="1 0.67059 0.87059 1" />
+          rgba="1 0.670588235294118 0.870588235294118 1" />
       </material>
     </visual>
     <collision>
@@ -45,78 +50,78 @@
     </collision>
   </link>
   <link
-    name="FR_link">
+    name="fr_link_0">
     <inertial>
       <origin
-        xyz="-1.9871E-05 0.013716 -0.050139"
+        xyz="0.000249312673537311 0.00191000474553339 0.0925044160531216"
         rpy="0 0 0" />
       <mass
-        value="0.11038" />
+        value="0.0926222295025173" />
       <inertia
-        ixx="0.00011182"
-        ixy="2.0626E-09"
-        ixz="-1.7773E-06"
-        iyy="0.0001567"
-        iyz="-2.2451E-12"
-        izz="5.3382E-05" />
+        ixx="0.000110493021443021"
+        ixy="1.62568120461394E-13"
+        ixz="1.77743214581187E-06"
+        iyy="0.000154826458282934"
+        iyz="1.2041229470706E-21"
+        izz="5.17548231086632E-05" />
     </inertial>
     <visual>
       <origin
         xyz="0 0 0"
-        rpy="0 0 0" />
+        rpy="0 1.5708 0" />
       <geometry>
         <mesh
-          filename="../meshes/FR_link.STL" />
+          filename="../meshes/fr_link_0.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.79216 0.79216 0.79216 1" />
+          rgba="1 0.670588235294118 0.870588235294118 1" />
       </material>
     </visual>
     <collision>
       <origin
         xyz="0 0 0"
-        rpy="0 0 0" />
+        rpy="0 1.5708 0" />
       <geometry>
         <mesh
-          filename="../meshes/FR_link.STL" />
+          filename="../meshes/fr_link_0.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="FR_joint"
+    name="fr_jnt_0"
     type="revolute">
     <origin
-      xyz="0.068396 -0.079 0.19165"
-      rpy="-1.5708 1.564 1.5708" />
+      xyz="0.20229 0.19155 0.095"
+      rpy="-1.5708 -0.0068295 1.5708" />
     <parent
       link="base_link" />
     <child
-      link="FR_link" />
+      link="fr_link_0" />
     <axis
-      xyz="0 0 1" />
+      xyz="0 0 -1" />
     <limit
       lower="0"
-      upper="3.14"
+      upper="0"
       effort="0"
       velocity="0" />
   </joint>
-  <link
-    name="FR_1_link">
+  <!-- <link
+    name="fr_link_1">
     <inertial>
       <origin
-        xyz="0.0291578714898912 -0.00987962579279213 -1.12132525487141E-14"
+        xyz="0.0291578714897264 5.55111512312578E-17 0.00211960462454606"
         rpy="0 0 0" />
       <mass
         value="0.0209412067295075" />
       <inertia
-        ixx="9.42722406410459E-07"
-        ixy="1.54265002106538E-07"
-        ixz="2.2356624005777E-21"
-        iyy="1.22072933903446E-05"
-        iyz="-2.24993126614424E-22"
-        izz="1.14710057680368E-05" />
+        ixx="9.42722406410458E-07"
+        ixy="8.45792176335471E-23"
+        ixz="1.54265002106541E-07"
+        iyy="1.14710057680368E-05"
+        iyz="-8.9335506155727E-23"
+        izz="1.22072933903446E-05" />
     </inertial>
     <visual>
       <origin
@@ -124,7 +129,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/FR_1_link.STL" />
+          filename="../meshes/fr_link_1.STL" />
       </geometry>
       <material
         name="">
@@ -138,43 +143,43 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/FR_1_link.STL" />
+          filename="../meshes/fr_link_1.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="FR_1_joint"
+    name="fr_jnt_1"
     type="revolute">
     <origin
-      xyz="0 0.031751 -0.082"
-      rpy="3.1416 0.97613 0" />
+      xyz="0 -0.02775 0.051896"
+      rpy="1.5708 0.54739 3.1416" />
     <parent
-      link="FR_link" />
+      link="fr_link_0" />
     <child
-      link="FR_1_link" />
+      link="fr_link_1" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 0 -1" />
     <limit
       lower="0"
-      upper="3.14"
+      upper="0"
       effort="0"
       velocity="0" />
   </joint>
   <link
-    name="FR_2_link">
+    name="fr_link_2">
     <inertial>
       <origin
-        xyz="-0.000248700730455437 -0.100976764101735 -0.00648758022394789"
+        xyz="0.100976765487836 -0.000248700705894042 0.00401165043991318"
         rpy="0 0 0" />
       <mass
-        value="0.0364575799194722" />
+        value="0.0364575808655264" />
       <inertia
-        ixx="5.58581169249248E-05"
-        ixy="5.66699347727094E-08"
-        ixz="4.43522719988858E-11"
-        iyy="9.04626145158037E-07"
-        iyz="1.08482409824532E-08"
-        izz="5.64901840947864E-05" />
+        ixx="9.04626156802422E-07"
+        ixy="-5.66699372868361E-08"
+        ixz="-1.08482391390852E-08"
+        iyy="5.5858116929233E-05"
+        iyz="4.43520261553087E-11"
+        izz="5.64901841043986E-05" />
     </inertial>
     <visual>
       <origin
@@ -182,7 +187,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/FR_2_link.STL" />
+          filename="../meshes/fr_link_2.STL" />
       </geometry>
       <material
         name="">
@@ -196,42 +201,42 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/FR_2_link.STL" />
+          filename="../meshes/fr_link_2.STL" />
       </geometry>
     </collision>
-  </link>
-  <joint
-    name="FR_2_joint"
+  </link> -->
+  <!-- <joint
+    name="fr_jnt_2"
     type="revolute">
     <origin
-      xyz="0.08 0 0"
-      rpy="1.5708 0.35633 3.1416" />
+      xyz="0.08 0 0.0015"
+      rpy="0 0 1.1903" />
     <parent
-      link="FR_1_link" />
+      link="fr_link_1" />
     <child
-      link="FR_2_link" />
+      link="fr_link_2" />
     <axis
       xyz="0 0 1" />
     <limit
       lower="0"
-      upper="3.14"
+      upper="0"
       effort="0"
       velocity="0" />
   </joint>
   <link
-    name="FR_3_link">
+    name="fr_link_3">
     <inertial>
       <origin
-        xyz="0.000136237888330254 0.0658007969173274 0.00599999999999996"
+        xyz="0.0658007969173512 0.000136237888315474 2.77555756156289E-17"
         rpy="0 0 0" />
       <mass
         value="0.0221842987960633" />
       <inertia
-        ixx="2.81354775768645E-05"
-        ixy="-1.46900586685661E-07"
-        ixz="4.89690922631392E-22"
-        iyy="5.34735340581066E-07"
-        iyz="2.15827965427336E-20"
+        ixx="5.34735340581067E-07"
+        ixy="-1.46900586685684E-07"
+        ixz="-4.6859781701129E-22"
+        iyy="2.81354775768645E-05"
+        iyz="9.26442286059391E-23"
         izz="2.85375296980227E-05" />
     </inertial>
     <visual>
@@ -240,7 +245,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/FR_3_link.STL" />
+          filename="../meshes/fr_link_3.STL" />
       </geometry>
       <material
         name="">
@@ -254,141 +259,83 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="../meshes/FR_3_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="FR_3_joint"
-    type="revolute">
-    <origin
-      xyz="0 -0.1 -0.016499"
-      rpy="0 0 -1.3056" />
-    <parent
-      link="FR_2_link" />
-    <child
-      link="FR_3_link" />
-    <axis
-      xyz="0 0 1" />
-    <limit
-      lower="0"
-      upper="3.14"
-      effort="0"
-      velocity="0" />
-  </joint>
-  <link
-    name="FR_4_link">
-    <inertial>
-      <origin
-        xyz="0.029158 0.0066196 2.0151E-14"
-        rpy="0 0 0" />
-      <mass
-        value="0.020941" />
-      <inertia
-        ixx="9.4272E-07"
-        ixy="1.5427E-07"
-        ixz="1.597E-21"
-        iyy="1.2207E-05"
-        iyz="-1.8198E-22"
-        izz="1.1471E-05" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="../meshes/FR_4_link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.62745 0.62745 0.62745 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="../meshes/FR_4_link.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="FR_4_joint"
-    type="revolute">
-    <origin
-      xyz="-0.064226 0.1777 0"
-      rpy="1.5708 0 -0.63878" />
-    <parent
-      link="FR_3_link" />
-    <child
-      link="FR_4_link" />
-    <axis
-      xyz="0 0.0068294 -0.99998" />
-    <limit
-      lower="0"
-      upper="3.14"
-      effort="0"
-      velocity="0" />
-  </joint>
-  <!-- <link
-    name="Empty_Link">
-    <inertial>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <mass
-        value="0" />
-      <inertia
-        ixx="0"
-        ixy="0"
-        ixz="0"
-        iyy="0"
-        iyz="0"
-        izz="0" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="../meshes/Empty_Link.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="1 1 1 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="../meshes/Empty_Link.STL" />
+          filename="../meshes/fr_link_3.STL" />
       </geometry>
     </collision>
   </link> -->
   <!-- <joint
-    name="tmp_joint"
+    name="fr_jnt_3"
     type="revolute">
     <origin
-      xyz="0 0 0"
-      rpy="0 0 0" />
+      xyz="0.1 0 0"
+      rpy="-3.1416 0 1.5798" />
     <parent
-      link="" />
+      link="fr_link_2" />
     <child
-      link="" />
+      link="fr_link_3" />
     <axis
-      xyz="0 -1 0" />
+      xyz="0 0 -1" />
     <limit
       lower="0"
-      upper="3.14"
+      upper="0"
+      effort="0"
+      velocity="0" />
+  </joint> -->
+  <!-- <link
+    name="fr_link_4">
+    <inertial>
+      <origin
+        xyz="0.0508421285102736 -6.93889390390723E-18 -0.00211960462454608"
+        rpy="0 0 0" />
+      <mass
+        value="0.0209412067295075" />
+      <inertia
+        ixx="9.42722406410457E-07"
+        ixy="2.23550730421284E-21"
+        ixz="1.5426500210654E-07"
+        iyy="1.14710057680368E-05"
+        iyz="3.01093742969302E-22"
+        izz="1.22072933903446E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../meshes/fr_link_4.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.627450980392157 0.627450980392157 0.627450980392157 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="../meshes/fr_link_4.STL" />
+      </geometry>
+    </collision>
+  </link> -->
+  <!-- <joint
+    name="fr_jnt_4"
+    type="revolute">
+    <origin
+      xyz="0.13 0 0.0015"
+      rpy="0 0 -1.4376" />
+    <parent
+      link="fr_link_3" />
+    <child
+      link="fr_link_4" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      lower="0"
+      upper="0"
       effort="0"
       velocity="0" />
   </joint> -->

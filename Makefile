@@ -2,24 +2,35 @@ all: build connect run
 
 # C++ build, run for real time control
 build:
-	make -C ./build
+	docker buildx build --platform linux/arm/v7 --load -t quadson:latest .
 
 start:
-	./start_can.sh
+	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+	docker run --rm -it \
+			--platform linux/arm/v7 \
+			--name quadson \
+			--network=host \
+			--cap-add=NET_ADMIN \
+			--device /dev/:/dev/ \
+			-v /tmp/:/tmp/ \
+			-v /run/udev/:/run/udev/ \
+			--mount type=bind,source=$(CURDIR)/quadson,target=/quadson \
+			quadson:latest \
+    	/bin/bash -c "clear; exec bash"
 
 run:
-	./build/source/quadson
+	# ./build/source/quadson
 
 stop:
-	./stop_can.sh
+	# ./stop_can.sh
 
-clean:
-	make -C ./build clean
+clean:		
+	# make -C ./build clean
 
 # Python build, run for simulation	
-Install:
-	python3 -m venv venv # Create
-	pip install -r requirements.txt # Install
+install-python:
+	# python3 -m venv venv # Create
+	# pip install -r requirements.txt # Install
 
 sim:
-	source venv/bin/activate && python3 ./python_scripts/sim.py
+	# source venv/bin/activate && python3 ./python_scripts/sim.py
