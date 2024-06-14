@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.16)
 project(Quadson VERSION 0.1.0)
 
 include(CTest)
 enable_testing()
 
-find_path(EIGEN3_INCLUDE_DIRS "Eigen" paths "/usr/include" "/usr/local/include" path_suffixes "eigen3")
+set(EIGEN3_INCLUDE_DIRS "/usr/include/eigen3")
 message(${EIGEN3_INCLUDE_DIRS})
 if ( NOT EIGEN3_INCLUDE_DIRS )
     message(FATAL_ERROR "CMake variable EIGEN3_INCLUDE_DIRS not found.")

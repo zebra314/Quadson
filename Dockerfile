@@ -6,6 +6,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential \
     cmake \
     can-utils \
-    libeigen3-dev
+    git
+
+RUN git clone -b 3.3.9 https://gitlab.com/libeigen/eigen.git
+RUN cp -r eigen/Eigen /usr/include/
 
 WORKDIR /quadson
