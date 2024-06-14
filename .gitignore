@@ -2,7 +2,6 @@
 venv
 quadson/build/build
 
-CMakeCache.txt
 CMakeFiles/
 quadson/build/Makefile
 Testing/
