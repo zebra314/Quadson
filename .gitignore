@@ -4,7 +4,6 @@ quadson/build/build
 
 CMakeCache.txt
 CMakeFiles/
-cmake_install.cmake
 quadson/build/Makefile
 Testing/
 source/
