@@ -1,13 +1,14 @@
 .vscode
 venv
-quadson/build/CMakeCache.txt
-quadson/build/CMakeFiles/
-quadson/build/cmake_install.cmake
-quadson/build/Makefile
-quadson/build/compile_commands.json
-quadson/build/Testing/
-quadson/build/source/
-quadson/build/CTestTestfile.cmake
-*.cmake
 quadson/build/build
 
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+quadson/build/Makefile
+compile_commands.json
+Testing/
+source/
+CTestTestfile.cmake
+.cmake/
+DartConfiguration.tcl
