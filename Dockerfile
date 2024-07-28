@@ -1,9 +1,8 @@
-FROM navikey/raspbian-buster:latest
+FROM arm32v7/gcc:latest
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update          
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     build-essential \
     can-utils \
     git \

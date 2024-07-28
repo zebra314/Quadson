@@ -1,11 +1,10 @@
-all: build connect run
+all: build start
 
 # C++ build, run for real time control
 build:
 	docker buildx build --platform linux/arm/v7 --load -t quadson:latest .
 
 start:
-	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 	docker run --rm -it \
 			--platform linux/arm/v7 \
 			--name quadson \
