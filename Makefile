@@ -1,35 +1,60 @@
-all: build start
+all: sim
 
-# C++ build, run for real time control
-build:
-	docker buildx build --platform linux/arm/v7 --load -t quadson:latest .
+# ---------------------------------- Native ---------------------------------- #
+# Launch on the raspberry pi
 
-start:
+nav:
+	$(MAKE) nav-connect
+	$(MAKE) nav-run
+
+nav-connect:
+	./start_can.sh
+nav-run:
+	./build/source/quadson
+nav-pause:
+	./build/source/quadson -p
+nav-disconnect:
+	./stop_can.sh
+nav-clean:		
+	make -C ./build clean
+
+# --------------------------------- Emulation -------------------------------- #
+# C++ build, run for real time control on PC (x86) using docker
+
+emu:
+	$(MAKE) emu-build
+	$(MAKE) emu-start
+
+emu-build:
+	docker buildx build -f Dockerfile.emu \
+		--platform linux/arm/v7 \
+		--load -t quadson-emu:latest .
+
+emu-start:
+	docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 	docker run --rm -it \
-			--platform linux/arm/v7 \
-			--name quadson \
-			--network=host \
-			--cap-add=NET_ADMIN \
-			--device /dev/:/dev/ \
-			-v /tmp/:/tmp/ \
-			-v /run/udev/:/run/udev/ \
-			--mount type=bind,source=$(CURDIR)/quadson,target=/quadson \
-			quadson:latest \
-    	/bin/bash -c "clear; exec bash"
+		--platform linux/arm/v7 \
+		--name quadson-emu \
+		--network=host \
+		--cap-add=NET_ADMIN \
+		--device /dev/:/dev/ \
+		-v /tmp/:/tmp/ \
+		-v /run/udev/:/run/udev/ \
+		--mount type=bind,source=$(CURDIR)/quadson,target=/quadson \
+		quadson-emu:latest
 
-run:
-	# ./build/source/quadson
-
-stop:
-	# ./stop_can.sh
-
-clean:		
-	# make -C ./build clean
-
-# Python build, run for simulation	
-install-python:
-	# python3 -m venv venv # Create
-	# pip install -r requirements.txt # Install
+# -------------------------------- Simulation -------------------------------- #
+# Python build, run for simulation
 
 sim:
-	# source venv/bin/activate && python3 ./python_scripts/sim.py
+	$(MAKE) sim-build
+	$(MAKE) sim-start
+
+sim-build:
+	docker build -f Dockerfile.sim -t quadson-sim:latest .
+
+sim-start:
+	docker run -it --rm \
+		--name quadson-sim \
+		--mount type=bind,source=$(CURDIR)/quadson-sim,target=/quadson-sim \
+		quadson-sim:latest
