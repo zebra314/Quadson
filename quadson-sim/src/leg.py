@@ -153,10 +153,10 @@ class Leg:
     x, y, z = point
 
     # Calculate the angle of the motor 0
-    angle0 = atan2(-y, z) - np.pi/2
+    angle0 = -atan2(z, -y)
 
     # Translate the points from 3D to 2D
-    offset_angle = np.pi/2 - atan2(-y, z)
+    offset_angle = -angle0
     transformation_matrix = np.array([
       [1, 0, 0],
       [0, cos(offset_angle), -sin(offset_angle)],
@@ -224,8 +224,8 @@ class Leg:
     points_alt = np.concatenate([points_alt, np.zeros((points_alt.shape[0], 1))], axis=1)
     transformation_matrix = np.array([
       [1, 0, 0],
-      [0, cos(angle0), -sin(angle0)],
-      [0, sin(angle0), cos(angle0)]
+      [0, cos(-angle0), -sin(-angle0)],
+      [0, sin(-angle0), cos(-angle0)]
     ])
     points = points @ transformation_matrix
     points_alt = points_alt @ transformation_matrix
