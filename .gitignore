@@ -11,3 +11,5 @@ cmake_install.cmake
 compile_commands.json
 CPackConfig.cmake
 CPackSourceConfig.cmake
+__pycache__/
+*.log
