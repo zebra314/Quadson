@@ -12,7 +12,7 @@ pybullet.setTimeStep(1/240)
 
 # Load the URDF file
 startPos = [0, 0, 0.4]
-robot = pybullet.loadURDF("./urdf/quadson.urdf", startPos, useFixedBase=False)
+robot = pybullet.loadURDF("./urdf/quadson_modified.urdf", startPos, useFixedBase=False)
 
 # Create a plane
 plane = pybullet.loadURDF("./urdf/plane.urdf")
