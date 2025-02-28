@@ -1,5 +1,10 @@
 <robot name="quadson" version="1.0">
 
+  <!-- 
+    Joints 
+  -->
+
+  <!-- Back Left -->
   <joint name="bl_joint0" type="revolute">
     <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
     <origin rpy="-0.00000 1.57080 0.00000" xyz="-0.20768 0.09541 0.00215"/>
@@ -40,6 +45,7 @@
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
 
+  <!-- Back Right -->
   <joint name="br_joint0" type="revolute">
     <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
     <origin rpy="-0.00000 1.57080 0.00000" xyz="-0.20768 -0.09459 0.00215"/>
@@ -80,6 +86,7 @@
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
 
+  <!-- Front Left -->
   <joint name="fl_jjoint1" type="revolute">
     <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
     <origin rpy="-1.57080 1.57080 0.00000" xyz="-0.00040 0.01862 0.05430"/>
@@ -103,7 +110,7 @@
     <child link="link3.004"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
-  
+
   <joint name="fl_jjoint4" type="revolute">
     <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
     <origin rpy="-0.00000 -0.00000 0.00000" xyz="-0.10334 -0.07887 0.00054"/>
@@ -111,6 +118,7 @@
     <child link="link4.005"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
+
   <joint name="fl_joint0" type="revolute">
     <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
     <origin rpy="0.00000 -1.57080 0.00000" xyz="0.20740 0.09541 0.00215"/>
@@ -118,6 +126,8 @@
     <child link="link0.004"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
+
+  <!-- Front Right -->
   <joint name="fr_joint0" type="revolute">
     <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
     <origin rpy="0.00000 -1.57080 0.00000" xyz="0.20740 -0.09459 0.00215"/>
@@ -125,6 +135,7 @@
     <child link="fr_link0.002"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
+
   <joint name="fr_joint1" type="revolute">
     <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
     <origin rpy="1.57080 1.57080 0.00000" xyz="0.00039 -0.01915 0.05430"/>
@@ -132,6 +143,7 @@
     <child link="fr_llink1.002"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
+
   <joint name="fr_joint2" type="revolute">
     <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
     <origin rpy="0.00000 0.00000 0.00000" xyz="0.04179 -0.06838 0.00778"/>
@@ -139,6 +151,7 @@
     <child link="fr_llink2.002"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
+
   <joint name="fr_joint3" type="revolute">
     <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
     <origin rpy="0.00000 0.00000 0.00000" xyz="-0.05995 -0.08004 -0.00055"/>
@@ -146,6 +159,7 @@
     <child link="fr_llink3.002"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
+
   <joint name="fr_joint4" type="revolute">
     <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
     <origin rpy="0.00000 0.00000 0.00000" xyz="-0.10341 0.07891 0.00044"/>
@@ -153,6 +167,12 @@
     <child link="fr_llink4.002"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
+
+  <!-- 
+    Links 
+  -->
+
+  <!-- Base Link -->
   <link name="base_link_.002_link">
     <inertial>
       <inertia ixx="0.00472" ixy="0.00000" ixz="0.00000" iyy="0.02855" iyz="-0.00000" izz="0.02916"/>
@@ -166,7 +186,15 @@
         <mesh filename="../meshes/dae/base_link.004.dae" scale="1.00000 1.00000 1.00000"/>
       </geometry>
     </visual>
+    <collision>
+      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 -0.00279"/>
+      <geometry>
+        <mesh filename="../meshes/dae/base_link.004.dae" scale="1.00000 1.00000 1.00000"/>
+      </geometry>
+    </collision>
   </link>
+
+  <!-- Front Right Links -->
   <link name="fr_link0.002">
     <inertial>
       <inertia ixx="0.00020" ixy="-0.00000" ixz="-0.00001" iyy="0.00118" iyz="0.00000" izz="0.00107"/>
@@ -181,6 +209,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="fr_llink1.002">
     <inertial>
       <inertia ixx="0.00012" ixy="0.00000" ixz="0.00007" iyy="0.00016" iyz="-0.00001" izz="0.00005"/>
@@ -195,6 +224,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="fr_llink2.002">
     <inertial>
       <inertia ixx="0.00062" ixy="0.00006" ixz="-0.00045" iyy="0.00095" iyz="0.00008" izz="0.00036"/>
@@ -209,6 +239,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="fr_llink3.002">
     <inertial>
       <inertia ixx="0.00012" ixy="-0.00000" ixz="0.00015" iyy="0.00031" iyz="0.00000" izz="0.00020"/>
@@ -223,6 +254,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="fr_llink4.002">
     <inertial>
       <inertia ixx="0.00012" ixy="-0.00000" ixz="-0.00006" iyy="0.00016" iyz="-0.00001" izz="0.00005"/>
@@ -237,6 +269,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link0.002">
     <inertial>
       <inertia ixx="0.00020" ixy="0.00000" ixz="0.00001" iyy="0.00118" iyz="0.00000" izz="0.00107"/>
@@ -251,6 +284,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link0.003">
     <inertial>
       <inertia ixx="0.00020" ixy="-0.00000" ixz="0.00001" iyy="0.00118" iyz="-0.00000" izz="0.00107"/>
@@ -265,6 +299,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link0.004">
     <inertial>
       <inertia ixx="0.00020" ixy="0.00000" ixz="-0.00001" iyy="0.00118" iyz="-0.00000" izz="0.00107"/>
@@ -279,6 +314,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link1.002">
     <inertial>
       <inertia ixx="0.00012" ixy="-0.00000" ixz="-0.00007" iyy="0.00016" iyz="-0.00001" izz="0.00005"/>
@@ -293,6 +329,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link1.003">
     <inertial>
       <inertia ixx="0.00012" ixy="0.00000" ixz="-0.00007" iyy="0.00016" iyz="0.00001" izz="0.00005"/>
@@ -307,6 +344,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link1.004">
     <inertial>
       <inertia ixx="0.00012" ixy="-0.00000" ixz="0.00007" iyy="0.00016" iyz="0.00001" izz="0.00005"/>
@@ -321,6 +359,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link2.002">
     <inertial>
       <inertia ixx="0.00062" ixy="-0.00006" ixz="0.00045" iyy="0.00095" iyz="0.00008" izz="0.00036"/>
@@ -335,6 +374,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link2.003">
     <inertial>
       <inertia ixx="0.00062" ixy="0.00006" ixz="0.00045" iyy="0.00095" iyz="-0.00008" izz="0.00036"/>
@@ -349,6 +389,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link2.004">
     <inertial>
       <inertia ixx="0.00062" ixy="-0.00006" ixz="-0.00045" iyy="0.00095" iyz="-0.00008" izz="0.00036"/>
@@ -363,6 +404,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link3.002">
     <inertial>
       <inertia ixx="0.00012" ixy="0.00000" ixz="-0.00015" iyy="0.00031" iyz="0.00000" izz="0.00020"/>
@@ -377,6 +419,7 @@
       </geometry>
     </visual>
   </link>
+  
   <link name="link3.003">
     <inertial>
       <inertia ixx="0.00012" ixy="-0.00000" ixz="-0.00015" iyy="0.00031" iyz="-0.00000" izz="0.00020"/>
@@ -391,6 +434,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link3.004">
     <inertial>
       <inertia ixx="0.00012" ixy="0.00000" ixz="0.00015" iyy="0.00031" iyz="-0.00000" izz="0.00020"/>
@@ -405,6 +449,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link4.001">
     <inertial>
       <inertia ixx="0.00012" ixy="0.00000" ixz="0.00006" iyy="0.00016" iyz="-0.00001" izz="0.00005"/>
@@ -419,6 +464,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link4.004">
     <inertial>
       <inertia ixx="0.00012" ixy="-0.00000" ixz="0.00006" iyy="0.00016" iyz="0.00001" izz="0.00005"/>
@@ -433,6 +479,7 @@
       </geometry>
     </visual>
   </link>
+
   <link name="link4.005">
     <inertial>
       <inertia ixx="0.00012" ixy="0.00000" ixz="-0.00006" iyy="0.00016" iyz="0.00001" izz="0.00005"/>
@@ -447,6 +494,7 @@
       </geometry>
     </visual>
   </link>
+
   <material name="Grey">
     <color rgba="0.39608 0.47059 0.54510 1.00000"/>
   </material>
