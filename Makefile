@@ -54,7 +54,14 @@ sim-build:
 	docker build -f Dockerfile.sim -t quadson-sim:latest .
 
 sim-start:
+	xhost +local:root
 	docker run -it --rm \
 		--name quadson-sim \
 		--mount type=bind,source=$(CURDIR)/quadson-sim,target=/quadson-sim \
+		--env="DISPLAY" \
+		-v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+		-e XDG_RUNTIME_DIR=/tmp \
+		-e QT_X11_NO_MITSHM=1 \
 		quadson-sim:latest
+	xhost -local:root
+
