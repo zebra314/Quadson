@@ -69,18 +69,18 @@
     <child link="br_link4"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
-  <joint name="fl_jjoint1" type="revolute">
-    <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
-    <origin rpy="-1.57080 1.57080 -0.00000" xyz="-0.00040 0.01862 0.05430"/>
-    <parent link="fl_link0"/>
-    <child link="fl_link1"/>
-    <axis xyz="0.00000 0.00000 1.00000"/>
-  </joint>
   <joint name="fl_joint0" type="revolute">
     <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
     <origin rpy="0.00000 -1.57080 0.00000" xyz="0.20740 0.09541 0.00215"/>
     <parent link="base_link"/>
     <child link="fl_link0"/>
+    <axis xyz="0.00000 0.00000 1.00000"/>
+  </joint>
+  <joint name="fl_joint1" type="revolute">
+    <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
+    <origin rpy="-1.57080 1.57080 -0.00000" xyz="-0.00040 0.01862 0.05430"/>
+    <parent link="fl_link0"/>
+    <child link="fl_link1"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
   <joint name="fl_joint2" type="revolute">
@@ -102,13 +102,6 @@
     <origin rpy="-0.00000 -0.00000 0.00000" xyz="-0.10334 -0.07887 0.00054"/>
     <parent link="fl_link3"/>
     <child link="fl_link4"/>
-    <axis xyz="0.00000 0.00000 1.00000"/>
-  </joint>
-  <joint name="fl_joint5" type="revolute">
-    <limit lower="-3.14000" upper="3.14000" effort="0.00000" velocity="0.00000"/>
-    <origin rpy="-1.57080 1.57080 -0.00000" xyz="-0.00040 0.01862 0.13630"/>
-    <parent link="fl_link0"/>
-    <child link="fl_joint5"/>
     <axis xyz="0.00000 0.00000 1.00000"/>
   </joint>
   <joint name="fr_joint0" type="revolute">
