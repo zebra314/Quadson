@@ -83,15 +83,16 @@ sim-start-docker:
 	xhost -local:root
 
 # ------------------------------------ ROS ----------------------------------- #
-# 
+# Launch in ROS noetic
+.PHONY: ros ros-build ros-run ros-clean
 
 ros:
-	$(MAKE) ros-build
-	$(MAKE) ros-run
-	$(MAKE) ros-clean
+	@$(MAKE) --no-print-directory ros-build
+	@$(MAKE) --no-print-directory ros-run
+	@$(MAKE) --no-print-directory ros-clean
 
 ros-build:
-	docker build -f Dockerfile.ros -t ros-noetic-zsh:latest .
+	docker build -f config/Dockerfile.ros -t ros-noetic-zsh:latest .
 
 ros-run:
 	xhost +local:root
@@ -101,7 +102,7 @@ ros-run:
 		-v /tmp/.X11-unix:/tmp/.X11-unix:ro \
 		-e XDG_RUNTIME_DIR=/tmp \
 		-e QT_X11_NO_MITSHM=1 \
-		--mount type=bind,source=$(shell pwd)/quadson_ros,target=/root/quadson_ws \
+		--mount type=bind,source=$(CURDIR)/quadson_ros,target=/root/quadson_ws \
 		--user $(id -u):$(id -g) \
 		--name ros-noetic-zsh \
 		ros-noetic-zsh:latest
