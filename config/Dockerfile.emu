@@ -1,0 +1,22 @@
+FROM arm32v7/gcc:latest
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Setup terminal enviroment
+COPY config/setup-zsh.sh /tmp/setup-zsh.sh
+RUN chmod +x /tmp/setup-zsh.sh && /tmp/setup-zsh.sh
+
+# Install system tools
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    can-utils \
+    git \
+    cmake \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Install Eigen
+RUN git clone -b 3.3.9 https://gitlab.com/libeigen/eigen.git
+RUN cp -r eigen/Eigen /usr/include/
+
+WORKDIR /quadson
+CMD ["bash", "-c", "clear && exec bash"]

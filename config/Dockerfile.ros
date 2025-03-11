@@ -1,0 +1,36 @@
+FROM ros:noetic
+
+# Setup terminal enviroment
+COPY config/setup-zsh.sh /tmp/setup-zsh.sh
+RUN chmod +x /tmp/setup-zsh.sh && /tmp/setup-zsh.sh
+
+# Install tmux
+RUN apt-get install tmux -y
+
+# Install GUI dependencies
+RUN apt-get update && apt-get install -y libpci-dev
+RUN apt-get update && apt-get install -y x11-apps
+RUN apt-get update && apt-get install -y qtwayland5
+RUN apt-get update && apt-get install -y qt5-default
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yqq xserver-xorg
+RUN apt-get update && apt-get install -y xwayland
+
+# # Install libeigen3-dev
+# RUN apt-get update && apt-get install -y libeigen3-dev
+
+# Install gazebo
+RUN apt-get install ros-noetic-gazebo-ros -y
+
+# Install rviz
+RUN apt-get update && apt-get install ros-noetic-rviz -y
+
+# Install ros packages
+RUN apt-get install ros-noetic-robot-state-publisher -y
+
+# Entry point
+COPY config/ros-entrypoint.sh /root/ros-entrypoint.sh
+RUN chmod +x /root/ros-entrypoint.sh
+ENTRYPOINT ["/root/ros-entrypoint.sh"]
+
+WORKDIR /root/quadson_ws
+CMD ["zsh"]
