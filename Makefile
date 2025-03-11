@@ -45,19 +45,36 @@ emu-start:
 
 # -------------------------------- Simulation -------------------------------- #
 # Python build, run for simulation
+.PHONY: sim sim-build-venv sim-start-venv sim-build-docker sim-start-docker
+
+SIM_METHOD ?= venv # docker, venv
 
 sim:
-	$(MAKE) sim-build
-	$(MAKE) sim-start
+	@echo "Starting simulation with method: $(SIM_METHOD)"
+	@$(MAKE) --no-print-directory sim-build-$(SIM_METHOD)
+	@$(MAKE) --no-print-directory sim-start-$(SIM_METHOD)
 
-sim-build:
-	docker build -f Dockerfile.sim -t quadson-sim:latest .
+sim-build-venv:
+	@test -d venv || ( \
+		echo "Creating virtual environment..." && \
+		python3 -m venv venv && \
+		. venv/bin/activate && \
+		pip install --upgrade pip && \
+		pip install -r config/requirements.txt \
+	)
 
-sim-start:
+sim-start-venv:
+	@. venv/bin/activate
+	@echo "Virtual environment activated."
+
+sim-build-docker:
+	docker build -f config/Dockerfile.sim -t quadson-sim:latest .
+
+sim-start-docker:
 	xhost +local:root
 	docker run -it --rm \
 		--name quadson-sim \
-		--mount type=bind,source=$(CURDIR)/quadson-sim,target=/quadson-sim \
+		--mount type=bind,source=$(CURDIR)/quadson_sim,target=/quadson_sim \
 		--env="DISPLAY" \
 		-v /tmp/.X11-unix:/tmp/.X11-unix:ro \
 		-e XDG_RUNTIME_DIR=/tmp \
