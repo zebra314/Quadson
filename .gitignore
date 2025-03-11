@@ -13,3 +13,7 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 __pycache__/
 *.log
+
+# ROS
+build/
+devel/
