@@ -65,3 +65,30 @@ sim-start:
 		quadson-sim:latest
 	xhost -local:root
 
+# ------------------------------------ ROS ----------------------------------- #
+# 
+
+ros:
+	$(MAKE) ros-build
+	$(MAKE) ros-run
+	$(MAKE) ros-clean
+
+ros-build:
+	docker build -f Dockerfile.ros -t ros-noetic-zsh:latest .
+
+ros-run:
+	xhost +local:root
+	-docker run -it \
+		--privileged \
+		--env="DISPLAY" \
+		-v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+		-e XDG_RUNTIME_DIR=/tmp \
+		-e QT_X11_NO_MITSHM=1 \
+		--mount type=bind,source=$(shell pwd)/quadson_ros,target=/root/quadson_ws \
+		--user $(id -u):$(id -g) \
+		--name ros-noetic-zsh \
+		ros-noetic-zsh:latest
+	xhost -local:root
+
+ros-clean:
+	docker container rm ros-noetic-zsh
