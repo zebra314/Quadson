@@ -1,8 +1,7 @@
 import xml.etree.ElementTree as ET
 import xml.dom.minidom as minidom
 
-def add_collision_to_urdf(urdf_path, output_path):
-    tree = ET.parse(urdf_path)
+def add_collision_to_urdf(tree):
     root = tree.getroot()
 
     for link in root.findall("link"):
@@ -34,22 +33,40 @@ def add_collision_to_urdf(urdf_path, output_path):
 
                     # Append collision object to the link
                     link.append(collision)
+    return tree
 
-    # Convert tree to a properly formatted string
-    rough_string = ET.tostring(root, encoding="utf-8")
-    reparsed = minidom.parseString(rough_string)
-    pretty_xml = reparsed.toprettyxml(indent="    ")
+def hide_dummy(tree):
+    root = tree.getroot()
 
-    # Remove empty lines
-    pretty_xml = '\n'.join([line for line in pretty_xml.split('\n') if line.strip()])
+    # Find all link elements with "dummy" in their name
+    for link in root.findall("link"):
+        link_name = link.get("name", "")
+        if "dummy" in link_name.lower():  # Case-insensitive check for "dummy"
+            # Remove all child elements
+            for child in list(link):
+                link.remove(child)
 
-    # Save the formatted URDF
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(pretty_xml)
-
-    print(f"Modified URDF saved to {output_path}")
+    return tree
 
 # Usage
-input_urdf = "../assets/urdf/quadson.urdf"
-output_urdf = "../assets/urdf/quadson_modified.urdf"
-add_collision_to_urdf(input_urdf, output_urdf)
+input_urdf = "../assets/whole_body/urdf/quadson.urdf"
+output_urdf = "../assets/whole_body/urdf/quadson_modified.urdf"
+
+tree = ET.parse(input_urdf)
+tree = add_collision_to_urdf(tree)
+tree = hide_dummy(tree)
+
+# Convert tree to a properly formatted string
+root = tree.getroot()
+rough_string = ET.tostring(root, encoding="utf-8")
+reparsed = minidom.parseString(rough_string)
+pretty_xml = reparsed.toprettyxml(indent="    ")
+
+# Remove empty lines
+pretty_xml = '\n'.join([line for line in pretty_xml.split('\n') if line.strip()])
+
+# Save the formatted URDF
+with open(output_urdf, "w", encoding="utf-8") as f:
+    f.write(pretty_xml)
+
+print(f"Modified URDF saved to {output_urdf}")
