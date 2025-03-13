@@ -38,7 +38,7 @@ p.createConstraint(
     childFramePosition=[0, 0, 0]
 )
 
-# # Enable joint motors
+# Enable joint motors
 p.setJointMotorControl2(
     bodyUniqueId=robot_id,
     jointIndex=joint1_index,

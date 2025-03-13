@@ -2,7 +2,7 @@ from math import *
 import numpy as np
 import warnings
 
-class Leg:
+class LegKinematics:
   """
   Represents a single leg of the quadruped robot. The leg is a five-bar linkage mechanism with three motors.
   

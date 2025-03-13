@@ -1,16 +1,18 @@
 import pybullet as p
+from src.leg_group import LegGroup
+from src.body_kinematics import BodyKinematics
 
 class Quadson:
   def __init__(self):
     self.robot_id = p.loadURDF("../assets/whole_body/urdf/quadson_modified.urdf", 
                                       basePosition=[0, 0, 0.35],
-                                      useFixedBase=False)
-    
+                                      useFixedBase=True)
     self.num_joints = p.getNumJoints(self.robot_id)
     self.joint_dict = self.get_joint_dict()
     self.setup_closed_chain()
     self.setup_colors()
-    # self.setup_motors()
+    self.setup_leg_groups()
+    self.body_kinematics = BodyKinematics()
 
   def get_joint_dict(self):
     joint_dict = {}
@@ -25,24 +27,16 @@ class Quadson:
     # The child link of joint 4 should connect back to the child link of joint 0 in each leg
     robot_id = self.robot_id
 
-    fl_link4 = self.joint_dict['fl_joint4']
-    fr_link4 = self.joint_dict['fr_joint4']
-    rl_link4 = self.joint_dict['rl_joint4']
-    rr_link4 = self.joint_dict['rr_joint4']
-
-    fl_link4_dummy = self.joint_dict['fl_joint5']
-    fr_link4_dummy = self.joint_dict['fr_joint5']
-    rl_link4_dummy = self.joint_dict['rl_joint5']
-    rr_link4_dummy = self.joint_dict['rr_joint5']
-
-    pair_links = [[fl_link4, fl_link4_dummy],
-                  [fr_link4, fr_link4_dummy],
-                  [rl_link4, rl_link4_dummy],
-                  [rr_link4, rr_link4_dummy]]
+    pairs = [
+      ("fl_joint4", "fl_joint5"),
+      ("fr_joint4", "fr_joint5"),
+      ("rl_joint4", "rl_joint5"),
+      ("rr_joint4", "rr_joint5")
+    ]
     
-    for links in pair_links:
-      link4 = links[0]
-      link4_dummy = links[1]
+    for joint4_name, joint5_name in pairs:
+      link4 = self.joint_dict[joint4_name]
+      link4_dummy = self.joint_dict[joint5_name]
 
       # Create the revolute constraint
       p.createConstraint(
@@ -76,9 +70,16 @@ class Quadson:
 
       p.changeVisualShape(self.robot_id, joint_index, rgbaColor=color)
 
+  def setup_leg_groups(self):
+    legs = {
+      "fl": ["fl_joint0", "fl_joint1", "fl_joint5"],  # Front-left
+      "fr": ["fr_joint0", "fr_joint1", "fr_joint5"],  # Front-right
+      "rl": ["rl_joint0", "rl_joint1", "rl_joint5"],  # Rear-left
+      "rr": ["rr_joint0", "rr_joint1", "rr_joint5"]   # Rear-right
+    }
 
-  def setup_motors(self):
-    for joint_index in range(self.num_joints):
-      joint_info = p.getJointInfo(self.robot_id, joint_index)
-      print(joint_info)
-      parent_index = joint_info[16]
+    self.leg_groups = {}
+    for leg_name, leg_joints in legs.items():
+      joint_indices = [self.joint_dict[joint_name] for joint_name in leg_joints]
+      leg_group = LegGroup(self.robot_id, joint_indices)
+      self.leg_groups[leg_name] = leg_group
