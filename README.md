@@ -4,44 +4,38 @@
 
 ## Usage
 
-### Real time control
+### Simulation
 
-- Activate the robot
+- Run the simulation
 
   ```sh
   make
   ```
 
-- Deactivate the robot
+- Use docker for simulation
 
   ```sh
-  make stop
+  make SIM_METHOD=docker
+  ```
+
+### Real time control on Raspberry Pi
+
+- Activate the robot
+
+  ```sh
+  make nav
   ```
 
 - Clean the project
 
   ```sh
-  make clean
-  ```
-
-### Simulation
-
-- Install the simulation
-
-  ```sh
-  make install
-  ```
-
-- Activate the simulation
-
-  ```sh
-  make sim
+  make nav-clean
   ```
 
 ## Files
 
 ```sh
-quadbot_ws/
+quadson_pi/
 │
 ├── build/
 │ ├── ...
