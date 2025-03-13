@@ -45,6 +45,19 @@ def hide_dummy(tree):
             # Remove all child elements
             for child in list(link):
                 link.remove(child)
+            
+            # Add minimal inertial element
+            inertial = ET.Element("inertial")
+            mass = ET.SubElement(inertial, "mass")
+            mass.set("value", "0.0001")  # Very small mass
+            inertia = ET.SubElement(inertial, "inertia")
+            inertia.set("ixx", "0.0001")
+            inertia.set("ixy", "0")
+            inertia.set("ixz", "0")
+            inertia.set("iyy", "0.0001")
+            inertia.set("iyz", "0")
+            inertia.set("izz", "0.0001")
+            link.append(inertial)
 
     return tree
 

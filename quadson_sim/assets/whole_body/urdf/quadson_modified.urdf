@@ -284,6 +284,10 @@
         </collision>
     </link>
     <link name="fl_link4_dummy">
+        <inertial>
+            <mass value="0.0001"/>
+            <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+        </inertial>
     </link>
     <link name="fr_link0">
         <inertial>
@@ -382,6 +386,10 @@
         </collision>
     </link>
     <link name="fr_link4_dummy">
+        <inertial>
+            <mass value="0.0001"/>
+            <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+        </inertial>
     </link>
     <link name="rl_link0">
         <inertial>
@@ -480,6 +488,10 @@
         </collision>
     </link>
     <link name="rl_link4_dummy">
+        <inertial>
+            <mass value="0.0001"/>
+            <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+        </inertial>
     </link>
     <link name="rr_link0">
         <inertial>
@@ -578,6 +590,10 @@
         </collision>
     </link>
     <link name="rr_link4_dummy">
+        <inertial>
+            <mass value="0.0001"/>
+            <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+        </inertial>
     </link>
     <material name="leg_linkage">
         <color rgba="0.80000 0.80000 0.80000 1.00000"/>
