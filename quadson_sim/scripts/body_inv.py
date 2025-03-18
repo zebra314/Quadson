@@ -2,14 +2,26 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.sim_setup import *
+import pybullet as p
+import pybullet_data
+import time
 from src.quadson import *
+
+def setup_bullet():
+  p.connect(p.GUI) # (GUI for visualization, DIRECT for headless)
+  p.resetSimulation()
+  p.setAdditionalSearchPath(pybullet_data.getDataPath())
+  p.setGravity(0, 0, -9.81)
+  p.setTimeStep(1/240)
+  plane_id = p.loadURDF("plane.urdf")
 
 def main():
   setup_bullet()
-  setup_env()
   quadson = Quadson()
-  run_simulation()
+  while True:
+    quadson.update_pose()
+    p.stepSimulation()
+    time.sleep(1 / 240)
 
 if __name__ == "__main__":
   main()
