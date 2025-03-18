@@ -1,7 +1,6 @@
 .vscode
 venv/
 CMakeFiles/
-source/
 Testing/
 CTestTestfile.cmake
 DartConfiguration.tcl
