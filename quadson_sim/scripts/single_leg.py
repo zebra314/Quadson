@@ -27,7 +27,7 @@ amplitude = max_angle  # Max angle to stay within ±30°
 link4_index = 3       # link4_link
 link4_dummy_index = 4 # link4_dummy_link
 
-p.createConstraint(
+id = p.createConstraint(
     parentBodyUniqueId=robot_id,
     parentLinkIndex=link4_index,
     childBodyUniqueId=robot_id,
@@ -37,22 +37,23 @@ p.createConstraint(
     parentFramePosition=[0, 0, 0],
     childFramePosition=[0, 0, 0]
 )
+p.changeConstraint(id, maxForce=1000000)
 
-# Enable joint motors
-p.setJointMotorControl2(
-    bodyUniqueId=robot_id,
-    jointIndex=joint1_index,
-    controlMode=p.POSITION_CONTROL,
-    targetPosition=0,
-    force=500  # Adjust force as needed
-)
-p.setJointMotorControl2(
-    bodyUniqueId=robot_id,
-    jointIndex=joint4_index,
-    controlMode=p.POSITION_CONTROL,
-    targetPosition=0,
-    force=500
-)
+# # Enable joint motors
+# p.setJointMotorControl2(
+#     bodyUniqueId=robot_id,
+#     jointIndex=joint1_index,
+#     controlMode=p.POSITION_CONTROL,
+#     targetPosition=0,
+#     force=500  # Adjust force as needed
+# )
+# p.setJointMotorControl2(
+#     bodyUniqueId=robot_id,
+#     jointIndex=joint4_index,
+#     controlMode=p.POSITION_CONTROL,
+#     targetPosition=0,
+#     force=500
+# )
 
 # Simulation loop
 time_step = 1.0 / 240.0  # PyBullet default time step
@@ -70,20 +71,20 @@ for t in range(100000):
     target_angle4 = max(-max_angle, min(max_angle, target_angle4))
 
     # Apply position control
-    # p.setJointMotorControl2(
-    #     bodyUniqueId=robot_id,
-    #     jointIndex=joint1_index,
-    #     controlMode=p.POSITION_CONTROL,
-    #     targetPosition=target_angle1,
-    #     force=500
-    # )
     p.setJointMotorControl2(
         bodyUniqueId=robot_id,
-        jointIndex=joint4_index,
+        jointIndex=joint1_index,
         controlMode=p.POSITION_CONTROL,
         targetPosition=target_angle4,
-        force=800
+        force=200
     )
+    # p.setJointMotorControl2(
+    #     bodyUniqueId=robot_id,
+    #     jointIndex=link4_index,
+    #     controlMode=p.POSITION_CONTROL,
+    #     targetPosition=0,
+    #     force=800
+    # )
 
     # Step the simulation
     p.stepSimulation()

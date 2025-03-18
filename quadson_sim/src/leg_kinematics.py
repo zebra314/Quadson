@@ -39,7 +39,7 @@ class LegKinematics:
   @property
   def motor_angles(self):
     if self._motor_angles is None:
-      raise ValueError("Error: _motor_angles is None")
+      raise warnings.warn("Error: _motor_angles is None")
     return self._motor_angles
   
   @motor_angles.setter
@@ -50,7 +50,7 @@ class LegKinematics:
   @property
   def ee_point(self):
     if self._ee_point is None:
-      raise ValueError("Error: _ee_point is None")
+      raise warnings.warn("Error: _ee_point is None")
     return self._ee_point
   
   @ee_point.setter
@@ -61,19 +61,19 @@ class LegKinematics:
   @property
   def points(self):
     if self._points is None:
-      raise ValueError("Error: _points is None")
+      raise warnings.warn("Error: _points is None")
     return self._points
 
   @property
   def angles(self):
     if self._angles is None:
-      raise ValueError("Error: _angles is None")
+      raise warnings.warn("Error: _angles is None")
     return self._angles
 
   @property
   def velocities(self):
     if self._velocities is None:
-      raise ValueError("Error: _velocities is None")
+      raise warnings.warn("Error: _velocities is None")
     return self._velocities
   
   @velocities.setter
@@ -84,7 +84,7 @@ class LegKinematics:
   @property
   def omegas(self):
     if self._omegas is None:
-      raise ValueError("Error: _omegas is None")
+      raise warnings.warn("Error: _omegas is None")
     return self._omegas
   
   @omegas.setter
@@ -113,7 +113,7 @@ class LegKinematics:
 
     # Check if the leg is reachable
     if(L24 > self.Ls[4] + self.Ls[2]):
-      raise ValueError("Leg is not reachable")
+      raise warnings.warn("Leg is not reachable")
     elif (L24 == self.Ls[4] + self.Ls[2]):
       warnings.warn("Leg reaches singularity", RuntimeWarning)
 

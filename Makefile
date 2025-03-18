@@ -45,27 +45,11 @@ emu-start:
 
 # -------------------------------- Simulation -------------------------------- #
 # Python build, run for simulation
-.PHONY: sim sim-build-venv sim-start-venv sim-build-docker sim-start-docker
-
-SIM_METHOD ?= venv # docker, venv
+.PHONY: sim sim-build-docker sim-start-docker
 
 sim:
-	@echo "Starting simulation with method: $(SIM_METHOD)"
-	@$(MAKE) --no-print-directory sim-build-$(SIM_METHOD)
-	@$(MAKE) --no-print-directory sim-start-$(SIM_METHOD)
-
-sim-build-venv:
-	@test -d venv || ( \
-		echo "Creating virtual environment..." && \
-		python3 -m venv venv && \
-		. venv/bin/activate && \
-		pip install --upgrade pip && \
-		pip install -r config/requirements.txt \
-	)
-
-sim-start-venv:
-	@. venv/bin/activate
-	@echo "Virtual environment activated."
+	@$(MAKE) sim-build-docker
+	@$(MAKE) sim-start-docker
 
 sim-build-docker:
 	docker build -f config/Dockerfile.sim -t quadson-sim:latest .
