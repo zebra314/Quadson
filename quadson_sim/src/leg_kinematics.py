@@ -1,6 +1,5 @@
 from math import *
 import numpy as np
-import warnings
 
 class LegKinematics:
   """
@@ -35,62 +34,79 @@ class LegKinematics:
     self._omegas = None
     self._points_alt = None
     self._angles_alt = None
+    self.unsafe_reasons = []
 
   @property
   def motor_angles(self):
     if self._motor_angles is None:
-      raise warnings.warn("Error: _motor_angles is None")
+      raise Exception("[Error] _motor_angles is None")
     return self._motor_angles
   
   @motor_angles.setter
   def motor_angles(self, angles):
-    self._motor_angles = angles
     self._ee_point = self.calc_ang2pnt(angles)
+    if self.unsafe_reasons:
+      print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
+      self.unsafe_reasons.clear()
+    else:
+      self._motor_angles = angles
 
   @property
   def ee_point(self):
     if self._ee_point is None:
-      raise warnings.warn("Error: _ee_point is None")
+      raise Exception("[Error] _ee_point is None")
     return self._ee_point
   
   @ee_point.setter
   def ee_point(self, point):
-    self._ee_point = point
     self._motor_angles = self.calc_pnt2ang(point)
+    if self.unsafe_reasons:
+      print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
+      self.unsafe_reasons.clear()
+    else:
+      self._ee_point = point
 
   @property
   def points(self):
     if self._points is None:
-      raise warnings.warn("Error: _points is None")
+      raise Exception("[Error] _points is None")
     return self._points
 
   @property
   def angles(self):
     if self._angles is None:
-      raise warnings.warn("Error: _angles is None")
+      raise Exception("[Error] _angles is None")
     return self._angles
 
   @property
   def velocities(self):
     if self._velocities is None:
-      raise warnings.warn("Error: _velocities is None")
+      raise Exception("[Error] _velocities is None")
     return self._velocities
   
   @velocities.setter
   def velocities(self, velocities):
-    self._velocities = velocities
     self._omegas = self.calc_vel2omg(velocities)
-  
+    if self.unsafe_reasons:
+      print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
+      self.unsafe_reasons.clear()
+    else:
+      self._velocities = velocities
+
   @property
   def omegas(self):
     if self._omegas is None:
-      raise warnings.warn("Error: _omegas is None")
+      raise Exception("[Error] _omegas is None")
     return self._omegas
   
   @omegas.setter
   def omegas(self, omegas):
-    self._omegas = omegas
     self._velocities = self.calc_omg2vel(omegas)
+    if self.unsafe_reasons:
+      print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
+      self.unsafe_reasons.clear()
+    else:
+      self._omegas = omegas
 
   def calc_ang2pnt(self, angles):
     '''
@@ -102,6 +118,17 @@ class LegKinematics:
     '''
     angle0, angle1, angle5 = angles
 
+    # Safety check
+    if angle0 > np.pi/2 or angle0 < -np.pi/2:
+      self.unsafe_reasons.append("angle0 out of range")
+      angle0 = np.clip(angle0, -np.pi/2, np.pi/2)
+    if angle1 > np.pi or angle1 < 0.25 * np.pi:
+      self.unsafe_reasons.append("angle1 out of range")
+      angle1 = np.clip(angle1, 0.25 * np.pi, np.pi)
+    if angle5 > 0.75 * np.pi or angle5 < 0:
+      self.unsafe_reasons.append("angle5 out of range")
+      angle5 = np.clip(angle5, 0, 0.75 * np.pi)
+
     # Start from 2D kinematics
     p1 = np.array([0, 0])
     p2 = np.array([self.Ls[1]*cos(angle1), -self.Ls[1]*sin(angle1)])
@@ -111,21 +138,34 @@ class LegKinematics:
     L14 = np.linalg.norm(p4-p1)
     L24 = np.linalg.norm(p4-p2)
 
-    # Check if the leg is reachable
+    # Safety check
     if(L24 > self.Ls[4] + self.Ls[2]):
-      raise warnings.warn("Leg is not reachable")
+      self.unsafe_reasons.append("Leg is not reachable")
+      return self._ee_point
     elif (L24 == self.Ls[4] + self.Ls[2]):
-      warnings.warn("Leg reaches singularity", RuntimeWarning)
+      self.unsafe_reasons.append("Leg reaches singularity")
+      return self._ee_point
 
-    # Calculate angle2
-    angle_324 = acos((self.Ls[2]**2 + L24**2 - self.Ls[4]**2) / (2 * self.Ls[2] * L24))
-    angle_421 = acos((self.Ls[1]**2 + L24**2 - L14**2) / (2 * self.Ls[1] * L24))
+    # Calculate p3 from angle2
+    angle_324 = self.safe_acos((self.Ls[2]**2 + L24**2 - self.Ls[4]**2) / (2 * self.Ls[2] * L24))
+    angle_421 = self.safe_acos((self.Ls[1]**2 + L24**2 - L14**2) / (2 * self.Ls[1] * L24))
     angle2 = angle_324 + angle_421 - (np.pi - angle1)
+    p3 = p2 + self.Ls[2] * np.array([cos(angle2), -sin(angle2)])
+
+    # Calculate p3 from angle4
+    angle_342 = self.safe_acos((self.Ls[4]**2 + L24**2 - self.Ls[2]**2) / (2 * self.Ls[4] * L24))
+    L25 = np.linalg.norm(p2-p5)
+    angle_245 = self.safe_acos((L24**2 + self.Ls[5]**2 - L25**2) / (2 * L24 * self.Ls[5]))
+    angle4 = np.pi + angle5 - (angle_342 + angle_245)
+    p3_alt = p4 + self.Ls[4] * np.array([cos(angle4), -sin(angle4)])
+
+    # Safety check
+    if not np.allclose(p3, p3_alt, atol=1e-4):
+      self.unsafe_reasons.append("Chain broken")
+      return self._ee_point
 
     # Calculate pe and p3 by averaging the positions
     pe = np.array([(self.Ls[2]+self.Ls[3])*cos(angle2), -(self.Ls[2]+self.Ls[3])*sin(angle2)]) + p2
-    p3 = (pe*self.Ls[2]+p2*self.Ls[3])/(self.Ls[2]+self.Ls[3])
-    angle4 = acos((p3-p4)[0] / np.linalg.norm(p3-p4))
 
     # Translate points from 2D to 3D, rotate the current plane to the x-y plane
     transformation_matrix = np.array([
@@ -137,6 +177,7 @@ class LegKinematics:
     points = np.concatenate([points, np.zeros((points.shape[0], 1))], axis=1)
     points = points @ transformation_matrix
 
+    # Update current joint angles and points
     self._points = points
     self._angles = np.array([angle0, angle1, angle2, None, angle4, angle5])
 
@@ -170,7 +211,7 @@ class LegKinematics:
     angle_e15 = atan2(-y, x)
     if angle_e15 < 0:
       angle_e15 += np.pi
-    angle_e12 = acos((self.Ls[1]**2 + L1e**2 - (self.Ls[2] + self.Ls[3])**2) / (2 * self.Ls[1] * L1e))
+    angle_e12 = self.safe_acos((self.Ls[1]**2 + L1e**2 - (self.Ls[2] + self.Ls[3])**2) / (2 * self.Ls[1] * L1e))
     angle1 = angle_e15 + angle_e12
 
     # Points based on angle 1
@@ -184,7 +225,7 @@ class LegKinematics:
     angle_350 = atan2(-p3[1], self.Ls[0] - p3[0])
     if angle_350 < 0:
       angle_350 += np.pi
-    angle_354 = acos((L35**2 + self.Ls[5]**2 - self.Ls[4]**2) / (2 * L35 * self.Ls[5]))
+    angle_354 = self.safe_acos((L35**2 + self.Ls[5]**2 - self.Ls[4]**2) / (2 * L35 * self.Ls[5]))
     angle5 = np.pi - (angle_350 + angle_354)
 
     # Point 4
@@ -202,19 +243,19 @@ class LegKinematics:
     angle_350_alt = atan2(-p3_alt[1], self.Ls[0] - p3_alt[0])
     if angle_350_alt < 0:
       angle_350_alt += np.pi
-    angle_354_alt = acos((L35_alt**2 + self.Ls[5]**2 - self.Ls[4]**2) / (2 * L35_alt * self.Ls[5]))
+    angle_354_alt = self.safe_acos((L35_alt**2 + self.Ls[5]**2 - self.Ls[4]**2) / (2 * L35_alt * self.Ls[5]))
     angle5_alt = np.pi - (angle_350_alt + angle_354_alt)
 
     # Alt Point 4
     p4_alt = np.array([self.Ls[5]*cos(angle5_alt), -self.Ls[5]*sin(angle5_alt)]) + p5
 
     # Store the states
-    angle2 = acos((pe_2d-p2)[0] / np.linalg.norm(pe_2d-p2))
-    angle4 = acos((p2-p4)[0] / np.linalg.norm(p2-p4))
+    angle2 = self.safe_acos((pe_2d-p2)[0] / self.safe_norm(pe_2d-p2))
+    angle4 = self.safe_acos((p2-p4)[0] / self.safe_norm(p2-p4))
     angles = np.array([angle0, angle1, angle2, None, angle4, angle5])
 
-    angle2_alt = acos((pe_2d-p2_alt)[0] / np.linalg.norm(pe_2d-p2_alt))
-    angle4_alt = acos((p2_alt-p4_alt)[0] / np.linalg.norm(p2_alt-p4_alt))
+    angle2_alt = self.safe_acos((pe_2d-p2_alt)[0] / self.safe_norm(pe_2d-p2_alt))
+    angle4_alt = self.safe_acos((p2_alt-p4_alt)[0] / self.safe_norm(p2_alt-p4_alt))
     angles_alt = np.array([angle0, angle1_alt, angle2_alt, None, angle4_alt, angle5_alt])
 
     # Translate the points from 2D to 3D
@@ -268,4 +309,14 @@ class LegKinematics:
       J[0:3, i] = (pe_perturbed - ee_point) / delta
       J[3:6, i] = [1 if i == 0 else 0, 0, 1 if i != 0 else 0] # Angular part simplified (adjust based on axes)
     return J
+  
+  def safe_acos(self, x):
+    if x < -1.0 or x > 1.0:
+      self.unsafe_reasons.append("acos input out of range")
+    return acos(np.clip(x, -1.0, 1.0))
+
+  def safe_norm(self, vec, eps=1e-6):
+    if np.linalg.norm(vec) < eps:
+      self.unsafe_reasons.append("norm input too small")
+    return np.linalg.norm(vec) + eps
   
