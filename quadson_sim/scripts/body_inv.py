@@ -13,13 +13,13 @@ def setup_bullet():
   p.setAdditionalSearchPath(pybullet_data.getDataPath())
   p.setGravity(0, 0, -9.81)
   p.setTimeStep(1/240)
-  plane_id = p.loadURDF("plane.urdf")
+  p.loadURDF("plane.urdf")
 
 def main():
   setup_bullet()
   quadson = Quadson()
   while True:
-    quadson.update_pose()
+    quadson.slider_update()
     p.stepSimulation()
     time.sleep(1 / 240)
 

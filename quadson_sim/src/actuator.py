@@ -5,11 +5,11 @@ class Actuator:
     self.robot_id = robot_id
     self.joint_index = joint_index
 
-  def set_motor_angle(self, motor_angle):
+  def set_angle(self, angle):
     p.setJointMotorControl2(
       bodyUniqueId=self.robot_id,
       jointIndex=self.joint_index,
       controlMode=p.POSITION_CONTROL,
-      targetPosition=motor_angle,
+      targetPosition=angle,
       force=800
     )

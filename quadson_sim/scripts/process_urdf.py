@@ -67,7 +67,7 @@ output_urdf = "../assets/whole_body/urdf/quadson_modified.urdf"
 
 tree = ET.parse(input_urdf)
 tree = add_collision_to_urdf(tree)
-tree = hide_dummy(tree)
+# tree = hide_dummy(tree)
 
 # Convert tree to a properly formatted string
 root = tree.getroot()
