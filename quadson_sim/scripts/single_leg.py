@@ -1,94 +1,69 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import pybullet as p
 import time
-import math
+import numpy as np
+from src.leg_kinematics import LegKinematics
+
+def joint_ctrl(joint_index, target_angle):
+  p.setJointMotorControl2(
+    bodyUniqueId=robot_id,
+    jointIndex=joint_index,
+    controlMode=p.POSITION_CONTROL,
+    targetPosition=target_angle,
+    force=500
+  )
+
+kinematics = LegKinematics()
+kinematics.motor_angles = [0, np.pi, np.pi/2]
+
+def get_env_angles(theory_angles):
+  j1_env = np.pi - theory_angles[1]
+  j5_env = np.pi/2 - theory_angles[5]
+
+  j2_env = 1.2406 - (np.pi + theory_angles[2] - theory_angles[1])
+  j4_env =  - 1.6833 + (np.pi + theory_angles[5] - theory_angles[4])
+
+  return [j1_env, j2_env, j4_env, j5_env]
+
+def enfore_closure(env_input):
+  kinematics.motor_angles = [0, np.pi-env_input[0], np.pi/2-env_input[1]]
+  env_angles = get_env_angles(kinematics.angles)
+
+  joint_ctrl(0, env_angles[0])
+  joint_ctrl(1, env_angles[1])
+  joint_ctrl(3, env_angles[2])
+  joint_ctrl(2, env_angles[3])
 
 # Connect to PyBullet
 p.connect(p.GUI)  # Use p.DIRECT for non-GUI mode
 p.setGravity(0, 0, -9.81)
 
 # Load the URDF
-robot_id = p.loadURDF("../assets/single_leg/urdf/single_leg_modified.urdf", useFixedBase=True)
-
-# Identify joint indices (based on URDF order)
-joint1_index = 0  # joint1 (link0_link to link1_link)
-joint4_index = 3  # joint4 (link3_link to link4_link)
+robot_id = p.loadURDF("../assets/single_leg/urdf/single_leg.urdf", useFixedBase=True)
 
 # Verify joint names (optional)
-for i in range(p.getNumJoints(robot_id)):
-    joint_info = p.getJointInfo(robot_id, i)
-    print(f"Joint {i}: {joint_info[1].decode('utf-8')}")
-
-# Define control parameters
-max_angle = 30 * (math.pi / 180)  # 30 degrees in radians (0.5236)
-frequency = 1.0  # Oscillation frequency in Hz
-amplitude = max_angle  # Max angle to stay within ±30°
-
-# Add fixed constraint to close the chain (from previous solution)
-link4_index = 3       # link4_link
-link4_dummy_index = 4 # link4_dummy_link
-
-id = p.createConstraint(
-    parentBodyUniqueId=robot_id,
-    parentLinkIndex=link4_index,
-    childBodyUniqueId=robot_id,
-    childLinkIndex=link4_dummy_index,
-    jointType=p.JOINT_FIXED,
-    jointAxis=[1, 0, 0],
-    parentFramePosition=[0, 0, 0],
-    childFramePosition=[0, 0, 0]
-)
-p.changeConstraint(id, maxForce=1000000)
-
-# # Enable joint motors
-# p.setJointMotorControl2(
-#     bodyUniqueId=robot_id,
-#     jointIndex=joint1_index,
-#     controlMode=p.POSITION_CONTROL,
-#     targetPosition=0,
-#     force=500  # Adjust force as needed
-# )
-# p.setJointMotorControl2(
-#     bodyUniqueId=robot_id,
-#     jointIndex=joint4_index,
-#     controlMode=p.POSITION_CONTROL,
-#     targetPosition=0,
-#     force=500
-# )
+# for i in range(p.getNumJoints(robot_id)):
+#   joint_info = p.getJointInfo(robot_id, i)
+#   print(f"{i}: {joint_info[1].decode('utf-8')}")
 
 # Simulation loop
 time_step = 1.0 / 240.0  # PyBullet default time step
 p.setRealTimeSimulation(0)  # Step simulation manually
 
+slider_joint1 = p.addUserDebugParameter('joint1', -np.pi, np.pi, 0)
+slider_joint5 = p.addUserDebugParameter('joint5', -np.pi, np.pi, 0)
+
 for t in range(100000):
-    current_time = t * time_step
-    
-    # Calculate target positions within ±30° using a sine wave
-    target_angle1 = amplitude * math.sin(2 * math.pi * frequency * current_time)
-    target_angle4 = amplitude * math.sin(2 * math.pi * frequency * current_time + math.pi)  # Phase offset for variety
+    bais1 = p.readUserDebugParameter(slider_joint1)
+    bais5 = p.readUserDebugParameter(slider_joint5)
+    env_input = [bais1, bais5]
 
-    # Ensure angles stay within ±30° (redundant due to amplitude, but good practice)
-    target_angle1 = max(-max_angle, min(max_angle, target_angle1))
-    target_angle4 = max(-max_angle, min(max_angle, target_angle4))
+    enfore_closure(env_input)
 
-    # Apply position control
-    p.setJointMotorControl2(
-        bodyUniqueId=robot_id,
-        jointIndex=joint1_index,
-        controlMode=p.POSITION_CONTROL,
-        targetPosition=target_angle4,
-        force=200
-    )
-    # p.setJointMotorControl2(
-    #     bodyUniqueId=robot_id,
-    #     jointIndex=link4_index,
-    #     controlMode=p.POSITION_CONTROL,
-    #     targetPosition=0,
-    #     force=800
-    # )
-
-    # Step the simulation
     p.stepSimulation()
-    time.sleep(time_step)  # Slow down for visualization
+    time.sleep(time_step)
 
-# Disconnect when done
 p.disconnect()
