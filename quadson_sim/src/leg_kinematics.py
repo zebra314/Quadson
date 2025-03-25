@@ -24,7 +24,7 @@ class LegKinematics:
     numerical_jacobian : Calculate the numerical Jacobian matrix for differential kinematics
   """
 
-  def __init__(self):
+  def __init__(self, DEBUG=False):
     self.Ls = [8.16, 8.0, 10.0, 8.0, 13.0, 8.0]
     self._motor_angles = None
     self._ee_point = None
@@ -35,6 +35,7 @@ class LegKinematics:
     self._points_alt = None
     self._angles_alt = None
     self.unsafe_reasons = []
+    self.DEBUG = DEBUG
 
   @property
   def motor_angles(self):
@@ -46,7 +47,8 @@ class LegKinematics:
   def motor_angles(self, angles):
     self._ee_point = self.calc_ang2pnt(angles)
     if self.unsafe_reasons:
-      print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
+      if self.DEBUG:
+        print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
       self.unsafe_reasons.clear()
     else:
       self._motor_angles = angles
@@ -61,7 +63,8 @@ class LegKinematics:
   def ee_point(self, point):
     self._motor_angles = self.calc_pnt2ang(point)
     if self.unsafe_reasons:
-      print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
+      if self.DEBUG:
+        print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
       self.unsafe_reasons.clear()
     else:
       self._ee_point = point
@@ -88,7 +91,8 @@ class LegKinematics:
   def velocities(self, velocities):
     self._omegas = self.calc_vel2omg(velocities)
     if self.unsafe_reasons:
-      print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
+      if self.DEBUG:
+        print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
       self.unsafe_reasons.clear()
     else:
       self._velocities = velocities
@@ -103,7 +107,8 @@ class LegKinematics:
   def omegas(self, omegas):
     self._velocities = self.calc_omg2vel(omegas)
     if self.unsafe_reasons:
-      print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
+      if self.DEBUG:
+        print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
       self.unsafe_reasons.clear()
     else:
       self._omegas = omegas
@@ -129,6 +134,11 @@ class LegKinematics:
       self.unsafe_reasons.append("angle5 out of range")
       angle5 = np.clip(angle5, 0, 0.75 * np.pi)
 
+    # Safety check, prevent excessive toe-in
+    if angle1 - angle5 < -0.06:
+      self.unsafe_reasons.append("Excessive toe-in")
+      return self._ee_point
+
     # Start from 2D kinematics
     p1 = np.array([0, 0])
     p2 = np.array([self.Ls[1]*cos(angle1), -self.Ls[1]*sin(angle1)])
@@ -139,7 +149,10 @@ class LegKinematics:
     L24 = np.linalg.norm(p4-p2)
 
     # Safety check
-    if(L24 > self.Ls[4] + self.Ls[2]):
+    if L24 < 5:
+      self.unsafe_reasons.append("P2, P4 too close")
+      return self._ee_point
+    elif(L24 >= self.Ls[4] + self.Ls[2]):
       self.unsafe_reasons.append("Leg is not reachable")
       return self._ee_point
     elif (L24 == self.Ls[4] + self.Ls[2]):
@@ -161,7 +174,7 @@ class LegKinematics:
 
     # Safety check
     if not np.allclose(p3, p3_alt, atol=1e-4):
-      self.unsafe_reasons.append("Chain broken")
+      self.unsafe_reasons.append("Open Chain P3 not matching")
       return self._ee_point
 
     # Calculate pe and p3 by averaging the positions
