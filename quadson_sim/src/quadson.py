@@ -1,18 +1,21 @@
 import pybullet as p
 import numpy as np
+from src.config import Config
+from src.interface import Interface
 from src.leg_group import LegGroup
+from src.body_kinematics import BodyKinematics
 
 class Quadson:
-  def __init__(self):
-    self.robot_id = p.loadURDF("../assets/whole_body/urdf/quadson_modified.urdf", 
+  def __init__(self, interface: Interface):
+    self.robot_id = p.loadURDF("../assets/whole_body/urdf/quadson_modified.urdf",
                                       basePosition=[0, 0, 0.35],
                                       useFixedBase=False)
     self.config = Config()
+    self.body_kinematics = BodyKinematics()
+    self.interface = interface
     self.joint_dict = self.setup_joint_dict()
     self.leg_group_dict = self.setup_leg_group()
-    self.slider_dict = self.setup_slider_interface()
     self.setup_colors()
-    self.motor_angle_dict = {}
 
   def setup_joint_dict(self):
     """
@@ -59,86 +62,25 @@ class Quadson:
     
     return leg_group_dict
 
-  def setup_slider_interface(self):
-    sliders = {}
-    for leg_name, leg_motors in self.config.motor_dict.items():
-      for motor_name in leg_motors:
-        slider_id = p.addUserDebugParameter(motor_name, -np.pi, np.pi, 0)
-        sliders[motor_name] = slider_id
-
-    return sliders
-
-  def slider_update(self):
-    # Get new angle from sliders
-    for leg_name, leg_motors in self.config.motor_dict.items():
-      motor_angles = []
-      for motor_name in leg_motors:
-        slider_inedx = self.slider_dict[motor_name]
-        angle = p.readUserDebugParameter(slider_inedx)
-        motor_angles.append(angle)
-      motor_angles = np.array([0, np.pi, np.pi/2]) - np.array(motor_angles)
-      self.motor_angle_dict[leg_name] = motor_angles
-
-    self.update()
-
   def update(self):
-    # Update the leg groups
-    for leg_name, angles in self.motor_angle_dict.items():
-      self.leg_group_dict[leg_name].set_motor_angles(angles)
+    self.interface.send_cmd()
+    self.input_dict = self.interface.output_dict[self.interface.target]
 
-class Config:
-  """
-  A class to store the joint names for the legs.
-  """
-  def __init__(self):
-    # Private
-    ## Front left leg
-    self._fl = "fl"
-    self._fl_joint0 = "fl_joint0"
-    self._fl_joint1 = "fl_joint1"
-    self._fl_joint2 = "fl_joint2"
-    self._fl_joint4 = "fl_joint4"
-    self._fl_joint5 = "fl_joint5"
-    self._fl_joints = [self._fl_joint0, self._fl_joint1, self._fl_joint2, self._fl_joint4, self._fl_joint5]
-    self._fl_motors = [self._fl_joint0, self._fl_joint1, self._fl_joint5]
-    
-    ## Front right leg
-    self._fr = "fr"
-    self._fr_joint0 = "fr_joint0"
-    self._fr_joint1 = "fr_joint1"
-    self._fr_joint2 = "fr_joint2"
-    self._fr_joint4 = "fr_joint4"
-    self._fr_joint5 = "fr_joint5"
-    self._fr_joints = [self._fr_joint0, self._fr_joint1, self._fr_joint2, self._fr_joint4, self._fr_joint5]
-    self._fr_motors = [self._fr_joint0, self._fr_joint1, self._fr_joint5]
-    
-    ## Rear left leg
-    self._rl = "rl"
-    self._rl_joint0 = "rl_joint0"
-    self._rl_joint1 = "rl_joint1"
-    self._rl_joint2 = "rl_joint2"
-    self._rl_joint4 = "rl_joint4"
-    self._rl_joint5 = "rl_joint5"
-    self._rl_joints = [self._rl_joint0, self._rl_joint1, self._rl_joint2, self._rl_joint4, self._rl_joint5]
-    self._rl_motors = [self._rl_joint0, self._rl_joint1, self._rl_joint5]
-    
-    ## Rear right leg
-    self._rr = "rr"
-    self._rr_joint0 = "rr_joint0"
-    self._rr_joint1 = "rr_joint1"
-    self._rr_joint2 = "rr_joint2"
-    self._rr_joint4 = "rr_joint4"
-    self._rr_joint5 = "rr_joint5"
-    self._rr_joints = [self._rr_joint0, self._rr_joint1, self._rr_joint2, self._rr_joint4, self._rr_joint5]
-    self._rr_motors = [self._rr_joint0, self._rr_joint1, self._rr_joint5]
+    handlers = {
+      'motor': self._update_motor,
+      'orientation': self._update_orientation,
+    }
+    handlers[self.interface.target]()
 
-    # Public
-    self.legs = [self._fl, self._fr, self._rl, self._rr]
-    self.joint_dict = {self._fl:self._fl_joints,
-                       self._fr:self._fr_joints,
-                       self._rl:self._rl_joints,
-                       self._rr:self._rr_joints}
-    self.motor_dict = {self._fl:self._fl_motors,
-                       self._fr:self._fr_motors,
-                       self._rl:self._rl_motors,
-                       self._rr:self._rr_motors}
+  def _update_motor(self):
+    base_angles = np.array([0, np.pi, np.pi/2])
+    for leg_name in self.config.legs:
+      motor_angles = base_angles - np.array(self.input_dict[leg_name])
+      self.leg_group_dict[leg_name].set_motor_angles(motor_angles)
+
+  def _update_orientation(self):
+    [roll, pitch, yaw] = [value for _, value in self.input_dict.items()]
+    self.body_kinematics.update_body_pose(roll, pitch, yaw)
+    ee_points = self.body_kinematics.ee_points
+    for leg_name, ee_point in zip(self.config.legs, ee_points):
+      self.leg_group_dict[leg_name].set_ee_point(ee_point)
