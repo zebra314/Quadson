@@ -3,16 +3,17 @@ import numpy as np
 class BodyKinematics:
   def __init__(self):
     # Body dimensions, shoulder on the vertices
-    body_width = 20
-    body_length = 40
-    self.body_z = 17
+    body_width = 22.4
+    body_length = 30.6
+    self.body_z = 17.028
 
     # Foothold coordinates in world frame
+    init_toe_x = -2.1634
     self.footholds = [
-      np.array([body_length/2-4, (body_width/2), 0]),  # Front-left
-      np.array([body_length/2-4, -(body_width/2), 0]), # Front-right
-      np.array([-body_length/2+4, (body_width/2), 0]), # Back-left
-      np.array([-body_length/2+4, -(body_width/2), 0]) # Back-right
+      np.array([body_length/2-init_toe_x, (body_width/2), 0]),  # Front-left
+      np.array([body_length/2-init_toe_x, -(body_width/2), 0]), # Front-right
+      np.array([-body_length/2+init_toe_x, (body_width/2), 0]), # Back-left
+      np.array([-body_length/2+init_toe_x, -(body_width/2), 0]) # Back-right
     ]
 
     # Shoulder coordinates in body frame
@@ -44,14 +45,10 @@ class BodyKinematics:
       self.Tbs_lst.append(Tbs)
 
     # Initialize the legs and calculate the end effector points
-    # self.legs = [Leg() for _ in range(4)]
-    self._ee_points = []
-    for (i, foothold) in enumerate(self.footholds):
-      Ts = self.Tb @ self.Tbs_lst[i]
-      Ts_inv = self.calc_inv_T(Ts)
-      pe = self.calc_projected_point(Ts_inv, foothold)
-      # self.legs[i].ee_point = pe
-      self._ee_points.append(pe)
+    self._ee_points = np.zeros((4, 3))
+    self._body_pose = [0, 0, 0]
+    
+    self.update_body_pose(0, 0, 0)
 
   def get_ee_points(self):
     return self._ee_points
@@ -132,5 +129,5 @@ class BodyKinematics:
       Ts = self.Tb @ self.Tbs_lst[i]
       Ts_inv = self.calc_inv_T(Ts)
       pe = self.calc_projected_point(Ts_inv, foothold)
-      # self.legs[i].ee_point = pe
       self._ee_points[i] = pe
+      
