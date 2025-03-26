@@ -16,54 +16,54 @@ def joint_ctrl(joint_index, target_angle):
     force=500
   )
 
-kinematics = LegKinematics()
-kinematics.motor_angles = [0, np.pi, np.pi/2]
-
-def get_env_angles(theory_angles):
+def enfore_closure(theory_angles):
+  # Theory to env
   j1_env = np.pi - theory_angles[1]
   j5_env = np.pi/2 - theory_angles[5]
 
   j2_env = 1.2406 - (np.pi + theory_angles[2] - theory_angles[1])
   j4_env =  - 1.6833 + (np.pi + theory_angles[5] - theory_angles[4])
 
-  return [j1_env, j2_env, j4_env, j5_env]
+  joint_ctrl(0, j1_env)
+  joint_ctrl(1, j2_env)
+  joint_ctrl(3, j4_env)
+  joint_ctrl(2, j5_env)
 
-def enfore_closure(env_input):
-  kinematics.motor_angles = [0, np.pi-env_input[0], np.pi/2-env_input[1]]
-  env_angles = get_env_angles(kinematics.angles)
-
-  joint_ctrl(0, env_angles[0])
-  joint_ctrl(1, env_angles[1])
-  joint_ctrl(3, env_angles[2])
-  joint_ctrl(2, env_angles[3])
-
-# Connect to PyBullet
-p.connect(p.GUI)  # Use p.DIRECT for non-GUI mode
+p.connect(p.GUI)
 p.setGravity(0, 0, -9.81)
-
-# Load the URDF
 robot_id = p.loadURDF("../assets/single_leg/urdf/single_leg.urdf", useFixedBase=True)
+time_step = 1.0 / 240.0
+p.setRealTimeSimulation(0)
+kinematics = LegKinematics(DEBUG=True)
 
-# Verify joint names (optional)
+# Joint info
 # for i in range(p.getNumJoints(robot_id)):
-#   joint_info = p.getJointInfo(robot_id, i)
-#   print(f"{i}: {joint_info[1].decode('utf-8')}")
+#   print(i, p.getJointInfo(robot_id, i)[1].decode("utf-8"))
 
-# Simulation loop
-time_step = 1.0 / 240.0  # PyBullet default time step
-p.setRealTimeSimulation(0)  # Step simulation manually
+x_id = p.addUserDebugParameter("x", -5, 20, -2.16399823)
+y_id = p.addUserDebugParameter("y", -20, -10, -17.02765643)
+# j1_id = p.addUserDebugParameter("j1", 0, np.pi, np.pi)
+# j5_id = p.addUserDebugParameter("j5", 0, np.pi, np.pi/2)
 
-slider_joint1 = p.addUserDebugParameter('joint1', -np.pi, np.pi, 0)
-slider_joint5 = p.addUserDebugParameter('joint5', -np.pi, np.pi, 0)
+for t in range(10000):
+  x = p.readUserDebugParameter(x_id)
+  y = p.readUserDebugParameter(y_id)
+  ee_point = [x, y, 0]
+  kinematics.set_ee_point(ee_point)
 
-for t in range(100000):
-    bais1 = p.readUserDebugParameter(slider_joint1)
-    bais5 = p.readUserDebugParameter(slider_joint5)
-    env_input = [bais1, bais5]
+  # j1 = p.readUserDebugParameter(j1_id)
+  # j5 = p.readUserDebugParameter(j5_id)
+  # kinematics.set_motor_angles([0, j1, j5])
+  # ee_point = kinematics.get_ee_point()
 
-    enfore_closure(env_input)
+  theory_angles = kinematics.get_angles()
+  enfore_closure(theory_angles)
 
-    p.stepSimulation()
-    time.sleep(time_step)
+  p.stepSimulation()
+  time.sleep(time_step)
 
-p.disconnect()
+while True:
+  p.stepSimulation()
+  time.sleep(time_step)
+
+# p.disconnect()
