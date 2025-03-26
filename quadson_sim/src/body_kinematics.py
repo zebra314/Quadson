@@ -53,9 +53,11 @@ class BodyKinematics:
       # self.legs[i].ee_point = pe
       self._ee_points.append(pe)
 
-  @property
-  def ee_points(self):
+  def get_ee_points(self):
     return self._ee_points
+  
+  def get_body_pose(self):
+    return self._body_pose
 
   def calc_rotation_matrix(self, roll, pitch, yaw):
     """

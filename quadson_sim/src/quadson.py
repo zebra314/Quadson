@@ -81,6 +81,6 @@ class Quadson:
   def _update_orientation(self):
     [roll, pitch, yaw] = [value for _, value in self.input_dict.items()]
     self.body_kinematics.update_body_pose(roll, pitch, yaw)
-    ee_points = self.body_kinematics.ee_points
+    ee_points = self.body_kinematics.get_ee_points()
     for leg_name, ee_point in zip(self.config.legs, ee_points):
       self.leg_group_dict[leg_name].set_ee_point(ee_point)
