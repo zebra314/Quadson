@@ -244,50 +244,32 @@ class LegKinematics:
     # Point 4
     p4 = np.array([self.Ls[5]*cos(angle5), -self.Ls[5]*sin(angle5)]) + p5
 
-    # Alt Angle 1
-    angle1_alt = angle_e15 - angle_e12
-
-    # Alt Points based on angle 1
-    p2_alt = np.array([self.Ls[1]*cos(angle1_alt), -self.Ls[1]*sin(angle1_alt)])
-    p3_alt = (pe_2d * self.Ls[2] + p2_alt * self.Ls[3]) / (self.Ls[2] + self.Ls[3])
-
-    # Alt Angle 5
-    L35_alt = np.linalg.norm(p3_alt - p5)
-    angle_350_alt = atan2(-p3_alt[1], self.Ls[0] - p3_alt[0])
-    if angle_350_alt < 0:
-      angle_350_alt += np.pi
-    angle_354_alt = self.safe_acos((L35_alt**2 + self.Ls[5]**2 - self.Ls[4]**2) / (2 * L35_alt * self.Ls[5]))
-    angle5_alt = np.pi - (angle_350_alt + angle_354_alt)
-
-    # Alt Point 4
-    p4_alt = np.array([self.Ls[5]*cos(angle5_alt), -self.Ls[5]*sin(angle5_alt)]) + p5
-
     # Store the states
     angle2 = self.safe_acos((pe_2d-p2)[0] / self.safe_norm(pe_2d-p2))
-    angle4 = self.safe_acos((p2-p4)[0] / self.safe_norm(p2-p4))
+    angle4 = self.safe_acos((p3-p4)[0] / self.safe_norm(p3-p4))
     angles = np.array([angle0, angle1, angle2, None, angle4, angle5])
-
-    angle2_alt = self.safe_acos((pe_2d-p2_alt)[0] / self.safe_norm(pe_2d-p2_alt))
-    angle4_alt = self.safe_acos((p2_alt-p4_alt)[0] / self.safe_norm(p2_alt-p4_alt))
-    angles_alt = np.array([angle0, angle1_alt, angle2_alt, None, angle4_alt, angle5_alt])
 
     # Translate the points from 2D to 3D
     points = np.array([p1, p2, p3, pe_2d, p4, p5])
     points = np.concatenate([points, np.zeros((points.shape[0], 1))], axis=1)
-    points_alt = np.array([p1, p2_alt, p3_alt, pe_2d, p4_alt, p5])
-    points_alt = np.concatenate([points_alt, np.zeros((points_alt.shape[0], 1))], axis=1)
+
     transformation_matrix = np.array([
       [1, 0, 0],
       [0, cos(-angle0), -sin(-angle0)],
       [0, sin(-angle0), cos(-angle0)]
     ])
     points = points @ transformation_matrix
-    points_alt = points_alt @ transformation_matrix
 
     self._points = points
     self._angles = angles
-    self._points_alt = points_alt
-    self._angles_alt = angles_alt
+
+    # Safety Check
+    if angle0 > np.pi/4 or angle0 < -np.pi/4:
+      self.unsafe_reasons.append("angle0 out of range")
+    if angle1 > 1.2 * np.pi or angle1 < 0.25 * np.pi:
+      self.unsafe_reasons.append("angle1 out of range")
+    if angle5 > 0.75 * np.pi or angle5 < 0:
+      self.unsafe_reasons.append("angle5 out of range")
 
     return [angle0, angle1, angle5]
   
