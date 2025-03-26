@@ -7,11 +7,11 @@ class LegGroup:
     self.robot_id = robot_id
     self.actuators = [Actuator(robot_id, joint_index) for joint_index in joint_indices]
     self.leg_kinematics = LegKinematics()
-    self.leg_kinematics.motor_angles = [0, np.pi, np.pi/2] # initial motor angles
+    self.leg_kinematics.set_motor_angles([0, np.pi, np.pi/2]) # initial motor angles
 
   def set_motor_angles(self, motor_angles):
-    self.leg_kinematics.motor_angles = motor_angles
-    theory_angles = self.leg_kinematics.angles
+    self.leg_kinematics.set_motor_angles(motor_angles)
+    theory_angles = self.leg_kinematics.get_angles()
     env_angles = self.get_env_angles(theory_angles)
     for actuator, motor_angle in zip(self.actuators, env_angles):
       actuator.set_angle(motor_angle)
@@ -29,10 +29,9 @@ class LegGroup:
     return [j0_env, j1_env, j2_env, j4_env, j5_env]
 
   def set_ee_point(self, ee_point):
-    self.leg_kinematics.ee_point = ee_point
-    motor_angles = self.leg_kinematics.motor_angles
-    for actuator, motor_angle in zip(self.actuators, motor_angles):
-      actuator.set_angle(motor_angle)
+    self.leg_kinematics.set_ee_point(ee_point)
+    motor_angles = self.leg_kinematics.get_motor_angles()
+    self.set_motor_angles(motor_angles)
 
   def get_ee_point(self):
     return self.leg_kinematics.ee_point
