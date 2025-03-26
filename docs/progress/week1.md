@@ -7,6 +7,7 @@
 - Create interface class for quadson
 - Implement body kinematics in bullet
 - Correct leg kinematics
+- Implement gait class
 
 ### Learnings
 

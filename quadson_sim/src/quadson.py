@@ -4,6 +4,7 @@ from src.config import Config
 from src.interface import Interface
 from src.leg_group import LegGroup
 from src.body_kinematics import BodyKinematics
+from src.gait import TrajectoryPlanner
 
 class Quadson:
   def __init__(self, interface: Interface):
@@ -12,6 +13,7 @@ class Quadson:
                                       useFixedBase=False)
     self.config = Config()
     self.body_kinematics = BodyKinematics()
+    self.trajectory_planner = TrajectoryPlanner(gait_type='trot')
     self.interface = interface
     self.joint_dict = self.setup_joint_dict()
     self.leg_group_dict = self.setup_leg_group()
@@ -71,6 +73,11 @@ class Quadson:
       'orientation': self._update_orientation,
     }
     handlers[self.interface.target]()
+
+  def step(self, time: float):
+    ee_points = self.trajectory_planner.get_trajectory(time)
+    for leg_name, ee_point in ee_points.items():
+      self.leg_group_dict[leg_name].set_ee_point(ee_point)
 
   def _update_motor(self):
     base_angles = np.array([0, np.pi, np.pi/2])
