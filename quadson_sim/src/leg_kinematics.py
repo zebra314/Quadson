@@ -37,30 +37,26 @@ class LegKinematics:
     self.unsafe_reasons = []
     self.DEBUG = DEBUG
 
-  @property
-  def motor_angles(self):
+  def get_motor_angles(self):
     if self._motor_angles is None:
       raise Exception("[Error] _motor_angles is None")
     return self._motor_angles
   
-  @motor_angles.setter
-  def motor_angles(self, angles):
-    self._ee_point = self.calc_ang2pnt(angles)
+  def set_motor_angles(self, motor_angles):
+    self._ee_point = self.calc_ang2pnt(motor_angles)
     if self.unsafe_reasons:
       if self.DEBUG:
         print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
       self.unsafe_reasons.clear()
     else:
-      self._motor_angles = angles
+      self._motor_angles = motor_angles
 
-  @property
-  def ee_point(self):
+  def get_ee_point(self):
     if self._ee_point is None:
       raise Exception("[Error] _ee_point is None")
     return self._ee_point
   
-  @ee_point.setter
-  def ee_point(self, point):
+  def set_ee_point(self, point):
     self._motor_angles = self.calc_pnt2ang(point)
     if self.unsafe_reasons:
       if self.DEBUG:
@@ -69,26 +65,22 @@ class LegKinematics:
     else:
       self._ee_point = point
 
-  @property
-  def points(self):
+  def get_points(self):
     if self._points is None:
       raise Exception("[Error] _points is None")
     return self._points
 
-  @property
-  def angles(self):
+  def get_angles(self):
     if self._angles is None:
       raise Exception("[Error] _angles is None")
     return self._angles
 
-  @property
-  def velocities(self):
+  def get_velocities(self):
     if self._velocities is None:
       raise Exception("[Error] _velocities is None")
     return self._velocities
   
-  @velocities.setter
-  def velocities(self, velocities):
+  def set_velocities(self, velocities):
     self._omegas = self.calc_vel2omg(velocities)
     if self.unsafe_reasons:
       if self.DEBUG:
@@ -97,14 +89,12 @@ class LegKinematics:
     else:
       self._velocities = velocities
 
-  @property
-  def omegas(self):
+  def get_omegas(self):
     if self._omegas is None:
       raise Exception("[Error] _omegas is None")
     return self._omegas
   
-  @omegas.setter
-  def omegas(self, omegas):
+  def set_omegas(self, omegas):
     self._velocities = self.calc_omg2vel(omegas)
     if self.unsafe_reasons:
       if self.DEBUG:
@@ -127,9 +117,9 @@ class LegKinematics:
     if angle0 > np.pi/2 or angle0 < -np.pi/2:
       self.unsafe_reasons.append("angle0 out of range")
       angle0 = np.clip(angle0, -np.pi/2, np.pi/2)
-    if angle1 > np.pi or angle1 < 0.25 * np.pi:
+    if angle1 > 1.2 * np.pi or angle1 < 0.25 * np.pi:
       self.unsafe_reasons.append("angle1 out of range")
-      angle1 = np.clip(angle1, 0.25 * np.pi, np.pi)
+      angle1 = np.clip(angle1, 0.25 * np.pi, 1.2 * np.pi)
     if angle5 > 0.75 * np.pi or angle5 < 0:
       self.unsafe_reasons.append("angle5 out of range")
       angle5 = np.clip(angle5, 0, 0.75 * np.pi)
@@ -247,6 +237,8 @@ class LegKinematics:
     # Store the states
     angle2 = self.safe_acos((pe_2d-p2)[0] / self.safe_norm(pe_2d-p2))
     angle4 = self.safe_acos((p3-p4)[0] / self.safe_norm(p3-p4))
+    if p3[1] > p4[1]:
+      angle4 = 2*np.pi - angle4
     angles = np.array([angle0, angle1, angle2, None, angle4, angle5])
 
     # Translate the points from 2D to 3D
