@@ -4,8 +4,14 @@
 
 ### Done
 
+- Create interface class for quadson
+- Implement body kinematics in bullet
+- Correct leg kinematics
+
 ### Learnings
 
 ### Problems
+
+- In leg kinematics, the angles value calculated by set_motor_angles() and set_ee_point() are different.
 
 ### Next
