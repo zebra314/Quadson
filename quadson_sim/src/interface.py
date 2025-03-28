@@ -12,8 +12,8 @@ class Interface:
       'motor': 12 motor of 4 legs
       'orientation': orientation of body
     """
-    valid_types = ['gui', 'num']
-    valid_targets = ['motor', 'orientation']
+    valid_types = ['gui', 'num', 'model']
+    valid_targets = ['motor', 'orientation', 'ee_offset']
 
     if type not in valid_types:
       print('[ERROR] Invalid control type')
@@ -29,6 +29,7 @@ class Interface:
       ('num', 'motor'): self._init_num_motor,
       ('gui', 'orientation'): self._init_gui_orientation,
       ('num', 'orientation'): self._init_num_orientation,
+      ('model', 'ee_offset'): self._init_model_ee_offset,
     }
 
     # Set the command value to the output dictionary
@@ -37,6 +38,7 @@ class Interface:
       ('num', 'motor'): self._send_cmd_num_motor,
       ('gui', 'orientation'): self._send_cmd_gui_orientation,
       ('num', 'orientation'): self._send_cmd_num_orientation,
+      ('model', 'ee_offset'): self._send_cmd_model_ee_offset,
     }
 
     self.init_handlers[self.type, self.target]()
@@ -76,6 +78,13 @@ class Interface:
                     'pitch': 0,
                     'yaw': 0,}
     }
+
+  def _init_model_ee_offset(self):
+    self.output_dict = {}
+    for leg_name, leg_motors in self.config.motor_dict.items():
+      self.output_dict[self.target][leg_name] = []
+      for motor_name in leg_motors:
+        self.output_dict[self.target][leg_name].append(0)
 
   def _send_cmd_gui_motor(self):
     for leg_name, leg_motors in self.config.motor_dict.items():
@@ -123,6 +132,13 @@ class Interface:
     """
     for key, value in cmd_dict.items():
       self.output_dict[self.target][key] = value
+
+  def _send_cmd_model_ee_offset(self, cmd_dict):
+    for leg_name, leg_motors in self.config.motor_dict.items():
+      motor_angles = []
+      for motor_name in leg_motors:
+        motor_angles.append(cmd_dict[leg_name][motor_name])
+      self.output_dict[self.target][leg_name] = motor_angles
 
   def send_cmd(self, cmd_dict=None):
     key = (self.type, self.target)

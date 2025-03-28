@@ -91,3 +91,34 @@ class Quadson:
     ee_points = self.body_kinematics.get_ee_points()
     for leg_name, ee_point in zip(self.config.legs, ee_points):
       self.leg_group_dict[leg_name].set_ee_point(ee_point)
+
+  def _update_ee_offset(self) -> None:
+    self.ee_offset = self.input_dict
+    ee_points = self.trajectory_planner.get_trajectory(self.time_step)
+    for leg_name, ee_point in ee_points.items():
+      offset = self.ee_offset[leg_name]
+      self.leg_group_dict[leg_name].set_ee_point(ee_point+offset)
+
+  def get_observation(self) -> Dict:
+    linear_vel, angular_vel = p.getBaseVelocity(self.robot_id)
+    linear_acc = [
+        (linear_vel[0] - self.last_linear_vel[0]) / self.time_step,
+        (linear_vel[1] - self.last_linear_vel[1]) / self.time_step,
+        (linear_vel[2] - self.last_linear_vel[2]) / self.time_step
+    ]
+    self.last_linear_vel = linear_vel
+    pos, ori = p.getBasePositionAndOrientation(self.robot_id)
+    euler_ori = p.getEulerFromQuaternion(ori)
+
+    digits = 5
+    obs = {}
+    obs['position'] = self.round_tuple(pos, digits)
+    obs['linear_vel'] = self.round_tuple(linear_vel, digits)
+    obs['linear_acc'] = self.round_tuple(linear_acc, digits)
+    obs['angular_vel'] = self.round_tuple(angular_vel, digits)
+    obs['euler_ori'] = self.round_tuple(euler_ori, digits)
+
+    return obs
+  
+  def round_tuple(self, t, digits):
+    return tuple(round(x, digits) for x in t)
