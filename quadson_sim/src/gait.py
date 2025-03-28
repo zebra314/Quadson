@@ -18,8 +18,8 @@ class GaitGenerator:
       return {
         'fl': 0.0,
         'fr': 0.5,
-        'rl': 0.0,
-        'rr': 0.5,
+        'rl': 0.5,
+        'rr': 0.0,
       }
     elif self.gait_type == 'walk':
       return {
