@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import pybullet as p
 import numpy as np
 from src.config import Config
@@ -5,6 +9,7 @@ from src.interface import Interface
 from src.leg_group import LegGroup
 from src.body_kinematics import BodyKinematics
 from src.gait import TrajectoryPlanner
+from typing import Dict
 
 class Quadson:
   def __init__(self, interface: Interface):
@@ -19,7 +24,12 @@ class Quadson:
     self.leg_group_dict = self.setup_leg_group()
     self.setup_colors()
 
-  def setup_joint_dict(self):
+    self.sim_time = 0
+    self.time_step = 1/240
+    self.last_linear_vel = [0, 0, 0]
+    self.ee_offset = [] # For ppo model control
+
+  def setup_joint_dict(self) -> Dict:
     """
     Return a dictionary of joint names and their indices
     """
@@ -29,7 +39,7 @@ class Quadson:
     }
     return joint_dict
   
-  def setup_colors(self):
+  def setup_colors(self) -> None:
     base_color = [0.2, 0.2, 0.2, 1]
     shoulder_color = [0.8, 0.5, 0.2, 1]
     leg_color = [0.7, 0.7, 0.7, 1]
@@ -49,7 +59,7 @@ class Quadson:
 
       p.changeVisualShape(self.robot_id, joint_index, rgbaColor=color)
 
-  def setup_leg_group(self):
+  def setup_leg_group(self) -> Dict:
     """
     Initialize leg groups dynamically from joint dictionary.
     Return a dictionary of leg name and the leg group object.
@@ -64,28 +74,30 @@ class Quadson:
     
     return leg_group_dict
 
-  def update(self):
+  def update(self) -> None:
+    self.sim_time += self.time_step
     self.interface.send_cmd()
     self.input_dict = self.interface.output_dict[self.interface.target]
 
     handlers = {
       'motor': self._update_motor,
       'orientation': self._update_orientation,
+      'ee_offset': self._update_ee_offset, # PPO model input
     }
     handlers[self.interface.target]()
 
-  def step(self, time: float):
+  def step(self, time: float) -> None:
     ee_points = self.trajectory_planner.get_trajectory(time)
     for leg_name, ee_point in ee_points.items():
       self.leg_group_dict[leg_name].set_ee_point(ee_point)
 
-  def _update_motor(self):
+  def _update_motor(self) -> None:
     base_angles = np.array([0, np.pi, np.pi/2])
     for leg_name in self.config.legs:
       motor_angles = base_angles - np.array(self.input_dict[leg_name])
       self.leg_group_dict[leg_name].set_motor_angles(motor_angles)
 
-  def _update_orientation(self):
+  def _update_orientation(self) -> None:
     [roll, pitch, yaw] = [value for _, value in self.input_dict.items()]
     self.body_kinematics.update_body_pose(roll, pitch, yaw)
     ee_points = self.body_kinematics.get_ee_points()
