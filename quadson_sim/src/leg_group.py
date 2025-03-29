@@ -34,8 +34,8 @@ class LegGroup:
     self.set_motor_angles(motor_angles)
 
   def get_ee_point(self):
-    return self.leg_kinematics.ee_point
+    return self.leg_kinematics.get_ee_point()
   
   def get_motor_angles(self):
-    return self.leg_kinematics.motor_angles
+    return self.leg_kinematics.get_motor_angles()
   

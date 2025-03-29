@@ -66,7 +66,7 @@ class Interface:
     }
 
   def _init_num_motor(self):
-    self.output_dict = {}
+    self.output_dict = {self.target:{}}
     for leg_name, leg_motors in self.config.motor_dict.items():
       self.output_dict[self.target][leg_name] = []
       for motor_name in leg_motors:
@@ -80,7 +80,7 @@ class Interface:
     }
 
   def _init_model_ee_offset(self):
-    self.output_dict = {}
+    self.output_dict = {self.target:{}}
     for leg_name, leg_motors in self.config.motor_dict.items():
       self.output_dict[self.target][leg_name] = []
       for motor_name in leg_motors:
@@ -134,11 +134,8 @@ class Interface:
       self.output_dict[self.target][key] = value
 
   def _send_cmd_model_ee_offset(self, cmd_dict):
-    for leg_name, leg_motors in self.config.motor_dict.items():
-      motor_angles = []
-      for motor_name in leg_motors:
-        motor_angles.append(cmd_dict[leg_name][motor_name])
-      self.output_dict[self.target][leg_name] = motor_angles
+    for leg_name in self.config.legs:
+      self.output_dict[self.target][leg_name] = cmd_dict[leg_name]
 
   def send_cmd(self, cmd_dict=None):
     key = (self.type, self.target)

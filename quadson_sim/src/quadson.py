@@ -74,9 +74,25 @@ class Quadson:
     
     return leg_group_dict
 
-  def update(self) -> None:
+  def update(self, cmd_dict=None) -> None:
+    # ----------------------------- Update the state ----------------------------- #
     self.sim_time += self.time_step
-    self.interface.send_cmd()
+    self.last_linear_vel = self.linear_vel
+    self.linear_vel, self.angular_vel = p.getBaseVelocity(self.robot_id)
+    self.linear_acc = [
+        (self.linear_vel[0] - self.last_linear_vel[0]) / self.time_step,
+        (self.linear_vel[1] - self.last_linear_vel[1]) / self.time_step,
+        (self.linear_vel[2] - self.last_linear_vel[2]) / self.time_step
+    ]
+    self.pos, self.ori = p.getBasePositionAndOrientation(self.robot_id)
+    self.euler_ori = p.getEulerFromQuaternion(self.ori)
+
+    # ---------------------------- Process the command --------------------------- #
+    if cmd_dict != None:
+      self.interface.send_cmd(cmd_dict)
+    else:
+      self.interface.send_cmd()
+
     self.input_dict = self.interface.output_dict[self.interface.target]
 
     handlers = {
@@ -106,31 +122,51 @@ class Quadson:
 
   def _update_ee_offset(self) -> None:
     self.ee_offset = self.input_dict
-    ee_points = self.trajectory_planner.get_trajectory(self.time_step)
+    ee_points = self.trajectory_planner.get_trajectory(self.sim_time)
     for leg_name, ee_point in ee_points.items():
       offset = self.ee_offset[leg_name]
       self.leg_group_dict[leg_name].set_ee_point(ee_point+offset)
 
+# ------------------------------- PPO Training ------------------------------- #
   def get_observation(self) -> Dict:
-    linear_vel, angular_vel = p.getBaseVelocity(self.robot_id)
-    linear_acc = [
-        (linear_vel[0] - self.last_linear_vel[0]) / self.time_step,
-        (linear_vel[1] - self.last_linear_vel[1]) / self.time_step,
-        (linear_vel[2] - self.last_linear_vel[2]) / self.time_step
-    ]
-    self.last_linear_vel = linear_vel
-    pos, ori = p.getBasePositionAndOrientation(self.robot_id)
-    euler_ori = p.getEulerFromQuaternion(ori)
+    # Body state
+    self.linear_vel, self.angular_vel = p.getBaseVelocity(self.robot_id)
+    self.pos, self.ori = p.getBasePositionAndOrientation(self.robot_id)
+    self.euler_ori = p.getEulerFromQuaternion(self.ori)
 
     digits = 5
-    obs = {}
-    obs['position'] = self.round_tuple(pos, digits)
-    obs['linear_vel'] = self.round_tuple(linear_vel, digits)
-    obs['linear_acc'] = self.round_tuple(linear_acc, digits)
-    obs['angular_vel'] = self.round_tuple(angular_vel, digits)
-    obs['euler_ori'] = self.round_tuple(euler_ori, digits)
+    pos = self.round_tuple(self.pos, digits)
+    linear_vel = self.round_tuple(self.linear_vel, digits)
+    angular_vel = self.round_tuple(self.angular_vel, digits)
+    euler_ori = self.round_tuple(self.euler_ori, digits)
+    body_state = np.concatenate([pos, euler_ori, linear_vel, angular_vel])
 
+    # Joint state
+    joints = []
+    for leg_name in self.config.legs:
+      motor_angles = self.leg_group_dict[leg_name].get_motor_angles()
+      joints.extend(motor_angles)
+    joints = np.array(joints)
+
+    # Phase
+    phase = self.trajectory_planner.gait_generator.get_phase(self.sim_time)
+    phase_list = []
+    for leg in self.config.legs:
+      phase_list.append(np.sin(phase[leg]))
+      phase_list.append(np.cos(phase[leg]))
+    phase_list = np.array(phase_list)
+
+    obs = np.concatenate([body_state, joints, phase_list])
     return obs
+  
+  def get_linear_velocity(self):
+    return self.linear_vel
+  
+  def get_orientation_rpy(self):
+    return self.euler_ori
+  
+  def get_position(self):
+    return self.pos
   
   def round_tuple(self, t, digits):
     return tuple(round(x, digits) for x in t)
