@@ -131,84 +131,84 @@ class QuadsonEnv(gym.Env):
     return False
 
 class PlottingCallback(BaseCallback):
-    """
-    Callback for plotting episode rewards during training.
-    """
-    def __init__(self, verbose=0):
-        super(PlottingCallback, self).__init__(verbose)
-        self.episode_rewards = []
-        self.moving_avg_rewards = []
-        self.window_size = 10  # For moving average
+  """
+  Callback for plotting episode rewards during training.
+  """
+  def __init__(self, verbose=0):
+    super(PlottingCallback, self).__init__(verbose)
+    self.episode_rewards = []
+    self.moving_avg_rewards = []
+    self.window_size = 10  # For moving average
+      
+  def _on_training_start(self):
+    """Initialize the plot when training starts"""
+    plt.figure(figsize=(10, 5))
+    plt.ion()  # Interactive mode
+    self.fig, self.ax = plt.subplots()
+    self.ax.set_xlabel('Episode')
+    self.ax.set_ylabel('Reward')
+    self.ax.set_title('Training Reward Over Time')
+    plt.show(block=False)
+    
+    # Initialize reward tracking
+    self.current_episode_reward = 0
+    
+  def _on_step(self):
+    """Update reward tracking on each step"""
+    # Get reward - handle both single and vectorized environments
+    if isinstance(self.locals['rewards'], list) or isinstance(self.locals['rewards'], np.ndarray):
+      reward = self.locals['rewards'][0]  # Take first env if vectorized
+    else:
+      reward = self.locals['rewards']
         
-    def _on_training_start(self):
-        """Initialize the plot when training starts"""
-        plt.figure(figsize=(10, 5))
-        plt.ion()  # Interactive mode
-        self.fig, self.ax = plt.subplots()
-        self.ax.set_xlabel('Episode')
-        self.ax.set_ylabel('Reward')
-        self.ax.set_title('Training Reward Over Time')
-        plt.show(block=False)
-        
-        # Initialize reward tracking
-        self.current_episode_reward = 0
-        
-    def _on_step(self):
-        """Update reward tracking on each step"""
-        # Get reward - handle both single and vectorized environments
-        if isinstance(self.locals['rewards'], list) or isinstance(self.locals['rewards'], np.ndarray):
-            reward = self.locals['rewards'][0]  # Take first env if vectorized
-        else:
-            reward = self.locals['rewards']
-            
-        # Accumulate reward
-        self.current_episode_reward += reward
-        
-        # Check if episode ended
-        done = self.locals['dones'] if isinstance(self.locals['dones'], bool) else self.locals['dones'][0]
-        
-        if done:
-            # Store episode reward
-            self.episode_rewards.append(self.current_episode_reward)
-            
-            # Calculate moving average
-            if len(self.episode_rewards) >= self.window_size:
-                avg = np.mean(self.episode_rewards[-self.window_size:])
-                self.moving_avg_rewards.append(avg)
-            else:
-                self.moving_avg_rewards.append(self.episode_rewards[-1])
-            
-            # Update plot
-            episodes = np.arange(len(self.episode_rewards))
-            
-            # Clear previous plot
-            self.ax.clear()
-            
-            # Plot raw rewards and moving average
-            self.ax.plot(episodes, self.episode_rewards, 'b-', alpha=0.3, label='Episode Reward')
-            self.ax.plot(episodes, self.moving_avg_rewards, 'r-', label='Moving Average')
-            
-            # Add labels
-            self.ax.set_xlabel('Episode')
-            self.ax.set_ylabel('Reward')
-            self.ax.set_title(f'Training Reward (Latest: {self.episode_rewards[-1]:.2f})')
-            self.ax.legend()
-            
-            # Refresh plot
-            plt.draw()
-            plt.pause(0.01)
-            
-            # Reset for next episode
-            self.current_episode_reward = 0
-            
-            if self.verbose > 0:
-                print(f"Episode {len(self.episode_rewards)}: Reward = {self.episode_rewards[-1]:.2f}")
-        
-        return True
-        
-    def _on_training_end(self):
-        """Save the final plot when training ends"""
-        plt.savefig('training_rewards.png')
-        if self.verbose > 0:
-            print(f"Training ended. Final plot saved to 'training_rewards.png'")
-        plt.close()
+    # Accumulate reward
+    self.current_episode_reward += reward
+    
+    # Check if episode ended
+    done = self.locals['dones'] if isinstance(self.locals['dones'], bool) else self.locals['dones'][0]
+    
+    if done:
+      # Store episode reward
+      self.episode_rewards.append(self.current_episode_reward)
+      
+      # Calculate moving average
+      if len(self.episode_rewards) >= self.window_size:
+        avg = np.mean(self.episode_rewards[-self.window_size:])
+        self.moving_avg_rewards.append(avg)
+      else:
+        self.moving_avg_rewards.append(self.episode_rewards[-1])
+      
+      # Update plot
+      episodes = np.arange(len(self.episode_rewards))
+      
+      # Clear previous plot
+      self.ax.clear()
+      
+      # Plot raw rewards and moving average
+      self.ax.plot(episodes, self.episode_rewards, 'b-', alpha=0.3, label='Episode Reward')
+      self.ax.plot(episodes, self.moving_avg_rewards, 'r-', label='Moving Average')
+      
+      # Add labels
+      self.ax.set_xlabel('Episode')
+      self.ax.set_ylabel('Reward')
+      self.ax.set_title(f'Training Reward (Latest: {self.episode_rewards[-1]:.2f})')
+      self.ax.legend()
+      
+      # Refresh plot
+      plt.draw()
+      plt.pause(0.01)
+      
+      # Reset for next episode
+      self.current_episode_reward = 0
+      
+      if self.verbose > 0:
+        print(f"Episode {len(self.episode_rewards)}: Reward = {self.episode_rewards[-1]:.2f}")
+    
+    return True
+      
+  def _on_training_end(self):
+    """Save the final plot when training ends"""
+    plt.savefig('training_rewards.png')
+    if self.verbose > 0:
+      print(f"Training ended. Final plot saved to 'training_rewards.png'")
+    plt.close()
