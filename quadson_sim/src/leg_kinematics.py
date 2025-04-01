@@ -1,5 +1,6 @@
 from math import *
 import numpy as np
+from typing import List
 
 class LegKinematics:
   """
@@ -42,7 +43,10 @@ class LegKinematics:
       raise Exception("[Error] _motor_angles is None")
     return self._motor_angles
   
-  def set_motor_angles(self, motor_angles):
+  def set_motor_angles(self, motor_angles) -> None:
+    """
+    [angle0, angle1, angle5], angles of the motors, rad
+    """
     self._ee_point = self.calc_ang2pnt(motor_angles)
     if self.unsafe_reasons:
       if self.DEBUG:
@@ -65,7 +69,10 @@ class LegKinematics:
     else:
       self._ee_point = point
 
-  def get_points(self):
+  def get_points(self) -> List:
+    """
+    Return an array in shape (6, 3), points of the joints in the leg's frame, cm
+    """
     if self._points is None:
       raise Exception("[Error] _points is None")
     return self._points
