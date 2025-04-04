@@ -77,12 +77,12 @@ class LegKinematics:
       raise Exception("[Error] _points is None")
     return self._points
 
-  def get_angles(self):
+  def get_angles(self) -> List:
     if self._angles is None:
       raise Exception("[Error] _angles is None")
     return self._angles
 
-  def get_velocities(self):
+  def get_velocities(self) -> List:
     if self._velocities is None:
       raise Exception("[Error] _velocities is None")
     return self._velocities
@@ -96,12 +96,12 @@ class LegKinematics:
     else:
       self._velocities = velocities
 
-  def get_omegas(self):
+  def get_omegas(self) -> List:
     if self._omegas is None:
       raise Exception("[Error] _omegas is None")
     return self._omegas
   
-  def set_omegas(self, omegas):
+  def set_omegas(self, omegas) -> List:
     self._velocities = self.calc_omg2vel(omegas)
     if self.unsafe_reasons:
       if self.DEBUG:
@@ -110,7 +110,7 @@ class LegKinematics:
     else:
       self._omegas = omegas
 
-  def calc_ang2pnt(self, angles):
+  def calc_ang2pnt(self, angles) -> List:
     '''
     Forward kinematics
     Given the angles of the motors, calculate the end point of the leg and the state of the leg.
@@ -263,7 +263,7 @@ class LegKinematics:
     self._angles = angles
 
     # Safety Check
-    if angle0 > np.pi/4 or angle0 < -np.pi/4:
+    if angle0 > np.pi/2 or angle0 < -np.pi/2:
       self.unsafe_reasons.append("angle0 out of range")
     if angle1 > 1.2 * np.pi or angle1 < 0.25 * np.pi:
       self.unsafe_reasons.append("angle1 out of range")
@@ -286,22 +286,23 @@ class LegKinematics:
     '''
     Given the linear velocity of the end effector, calculate the angular velocities of the motors.
 
-    @param velocities: Linear velocity of the end effector, size 3 [vx, vy, vz]
+    @param velocities: Linear and angular velocity of the end effector, size 6 [vx, vy, vz, wx, wy, wz]
     @return: Angular velocities of the motors, size 3 [omega0, omega1, omega5]
     '''
     J = self.numerical_jacobian()
-    return np.linalg.pinv(J) @ velocities
+    J_inv = np.linalg.pinv(J)
+    omegas = J_inv @ np.array(velocities)
+    return omegas
   
-  def numerical_jacobian(self, delta=1e-4):
+  def numerical_jacobian(self, delta=1e-5):
     motor_angles = self._motor_angles
     ee_point = self._ee_point
-    J = np.zeros((6, 3))
+    J = np.zeros((3, 3))
     for i in range(3):
       angles_perturbed = motor_angles.copy()
       angles_perturbed[i] += delta
       pe_perturbed = self.calc_ang2pnt(angles_perturbed)
       J[0:3, i] = (pe_perturbed - ee_point) / delta
-      J[3:6, i] = [1 if i == 0 else 0, 0, 1 if i != 0 else 0] # Angular part simplified (adjust based on axes)
     return J
   
   def safe_acos(self, x):
