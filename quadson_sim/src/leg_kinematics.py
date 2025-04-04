@@ -1,28 +1,37 @@
 from math import *
 import numpy as np
-from typing import List
 
 class LegKinematics:
   """
   Represents a single leg of the quadruped robot. The leg is a five-bar linkage mechanism with three motors.
   
-  Attributes:
+  Attributes
+  ----------
     Ls            : [L0, L1, L2, L3, L4, L5], length of the links, cm
-    _motor_angles : [angle0, angle1, angle5], angles of the motors, rad
+    _motor_angles : [angle0, angle1, angle5], angle of the motors, rad
     _ee_point     : [x, y, z], position of the end effector, cm
-    _points       : (6, 3), points of the joints in the leg's frame, cm
-    _angles       : (6,), angles of the joints, rad
-    _velocities   : [vx, vy, vz], linear velocity of the end effector, cm/s
-    _omegas       : [omega0, omega1, omega5], angular velocities of the motors, rad/s
-    _points_alt   : (6, 3), the second possible points of the joints, result from the calculation of the inverse kinematics
-    _angles_alt   : (6,), the second possible angles of the joints, result from the calculation of the inverse kinematics
-
-  Methods:
-    calc_ang2pnt       : Forward kinematics, (motor angles -> end effector point)
-    calc_pnt2ang       : Inverse kinematics, (end effector point -> motor angles)
-    calc_omg2vel       : Forward differential kinematics, (motor omega -> end effector velocity)
-    calc_vel2omg       : Inverse differential kinematics, (end effector velocity -> motor omega)
-    numerical_jacobian : Calculate the numerical Jacobian matrix for differential kinematics
+    _points       : shape (6, 3), position of the joints, cm
+    _angles       : shape (6,), angle of the joints, rad
+    _ee_velocity  : [vx, vy, vz], linear velocity of the end effector, cm/s
+    _motor_omegas : [omega0, omega1, omega5], angular velocity of the motors, rad/s
+  
+  Methods
+  -------
+    get_motor_angles   : Return current motor angles.
+    set_motor_angles   : Set new motor angles, and update end effector position.
+    get_ee_point       : Return current end effector position.
+    set_ee_point       : Set new end effector position, and update motor angles.
+    get_points         : Return current position of the joints.
+    get_angles         : Return current angle of the joints.
+    get_ee_velocity    : Return current linear velocity of the end effector.
+    set_ee_velocity    : Set new linear velocity of the end effector, and update angular velocity of the motors.
+    get_motor_omegas   : Return current angular velocity of the motors.
+    set_motor_omegas   : Set new angular velocity of the motors, and update linear velocity of the end effector.
+    calc_ang2pnt       : Forward kinematics (motor angles -> end effector position)
+    calc_pnt2ang       : Inverse kinematics (end effector position -> motor angles)
+    calc_omg2vel       : Forward differential kinematics (motor omegas -> end effector velocity)
+    calc_vel2omg       : Inverse differential kinematics (end effector velocity -> motor omegas)
+    numerical_jacobian : Calculate numerical Jacobian matrix for differential kinematics.
   """
 
   def __init__(self, DEBUG=False):
@@ -31,21 +40,26 @@ class LegKinematics:
     self._ee_point = None
     self._points = None
     self._angles = None
-    self._velocities = None
-    self._omegas = None
-    self._points_alt = None
-    self._angles_alt = None
+    self._ee_velocity = None
+    self._motor_omegas = None
     self.unsafe_reasons = []
     self.DEBUG = DEBUG
 
-  def get_motor_angles(self):
+  def get_motor_angles(self) -> list[float]:
+    """
+    Return current motor angles.
+
+    :return _motor_angles: [angle0, angle1, angle5], rad
+    """
     if self._motor_angles is None:
       raise Exception("[Error] _motor_angles is None")
     return self._motor_angles
   
-  def set_motor_angles(self, motor_angles) -> None:
+  def set_motor_angles(self, motor_angles: list[float]) -> None:
     """
-    [angle0, angle1, angle5], angles of the motors, rad
+    Set new motor angles, and update end effector position.
+    
+    :param motor_angles: [angle0, angle1, angle5], rad
     """
     self._ee_point = self.calc_ang2pnt(motor_angles)
     if self.unsafe_reasons:
@@ -55,70 +69,106 @@ class LegKinematics:
     else:
       self._motor_angles = motor_angles
 
-  def get_ee_point(self):
+  def get_ee_point(self) -> list[float]:
+    """
+    Return current end effector position.
+    
+    :return _ee_point: [x, y, z], cm
+    """
     if self._ee_point is None:
       raise Exception("[Error] _ee_point is None")
     return self._ee_point
   
-  def set_ee_point(self, point):
-    self._motor_angles = self.calc_pnt2ang(point)
+  def set_ee_point(self, ee_point: list[float]) -> None:
+    """
+    Set new end effector position, and update motor angles.
+    
+    :param ee_point: [x, y, z], cm
+    """
+    self._motor_angles = self.calc_pnt2ang(ee_point)
     if self.unsafe_reasons:
       if self.DEBUG:
         print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
       self.unsafe_reasons.clear()
     else:
-      self._ee_point = point
+      self._ee_point = ee_point
 
-  def get_points(self) -> List:
+  def get_points(self) -> list[float]:
     """
-    Return an array in shape (6, 3), points of the joints in the leg's frame, cm
+    Return current position of the joints.
+
+    :return _points: shape (6, 3), cm
     """
     if self._points is None:
       raise Exception("[Error] _points is None")
     return self._points
 
-  def get_angles(self) -> List:
+  def get_angles(self) -> list[float]:
+    """
+    Return current angle of the joints.
+
+    :return _angles: shape (6, ), rad
+    """
     if self._angles is None:
       raise Exception("[Error] _angles is None")
     return self._angles
 
-  def get_velocities(self) -> List:
-    if self._velocities is None:
-      raise Exception("[Error] _velocities is None")
-    return self._velocities
+  def get_ee_velocity(self) -> list[float]:
+    """
+    Return current linear velocity of the end effector.
+
+    :return _velocity: [vx, vy, vz], cm/s
+    """
+    if self._ee_velocity is None:
+      raise Exception("[Error] _velocity is None")
+    return self._ee_velocity
   
-  def set_velocities(self, velocities):
-    self._omegas = self.calc_vel2omg(velocities)
+  def set_ee_velocity(self, ee_velocity: list[float]) -> None:
+    """
+    Set new linear velocity of the end effector, and update angular velocity of the motors.
+    
+    :param ee_velocity: [vx, vy, vz], cm/s
+    """
+    self._motor_omegas = self.calc_vel2omg(ee_velocity)
     if self.unsafe_reasons:
       if self.DEBUG:
         print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
       self.unsafe_reasons.clear()
     else:
-      self._velocities = velocities
+      self._ee_velocity = ee_velocity
 
-  def get_omegas(self) -> List:
-    if self._omegas is None:
+  def get_motor_omegas(self) -> list[float]:
+    """
+    Return the current angular velocity of the motors
+    
+    :return _motor_omegas: [omega0, omega1, omega5], rad/s
+    """
+    if self._motor_omegas is None:
       raise Exception("[Error] _omegas is None")
-    return self._omegas
+    return self._motor_omegas
   
-  def set_omegas(self, omegas) -> List:
-    self._velocities = self.calc_omg2vel(omegas)
+  def set_motor_omegas(self, motor_omegas: list[float]) -> None:
+    """
+    Set new angular velocity of the motors, and update linear velocity of the end effector.
+    
+    :param motor_omegas: [omega0, omega1, omega5], rad/s
+    """
+    self._ee_velocity = self.calc_omg2vel(motor_omegas)
     if self.unsafe_reasons:
       if self.DEBUG:
         print(f"[WARN] Unsafe conditions detected: {', '.join(self.unsafe_reasons)}")
       self.unsafe_reasons.clear()
     else:
-      self._omegas = omegas
+      self._motor_omegas = motor_omegas
 
-  def calc_ang2pnt(self, angles) -> List:
+  def calc_ang2pnt(self, motor_angles: list[float]) -> list[float]:
     '''
-    Forward kinematics
-    Given the angles of the motors, calculate the end point of the leg and the state of the leg.
-
-    @param motor_angles: Angles of the motors, size 3 [angle0, angle1, angle5]
-    @return: state object
+    Given motor angles, calculate end effector position and update states of the leg
+    
+    :param motor_angles: [angle0, angle1, angle5], angle of the motors, rad
+    :return: [x, y, z], end effector position, cm
     '''
-    angle0, angle1, angle5 = angles
+    angle0, angle1, angle5 = motor_angles
 
     # Safety check
     if angle0 > np.pi/2 or angle0 < -np.pi/2:
@@ -191,17 +241,17 @@ class LegKinematics:
     self._points = points
     self._angles = np.array([angle0, angle1, angle2, None, angle4, angle5])
 
-    return points[3]
+    ee_point = points[3]
+    return ee_point
   
-  def calc_pnt2ang(self, point):
+  def calc_pnt2ang(self, ee_point: list[float]) -> list[float]:
     '''
-    Inverse kinematics
-    Given the end point of the leg, calculate the angles of the motors and the state of the leg.
-
-    @param end_point: Position of the end point, size 3 [x, y, z]
-    @return: state object
+    Given end effector position, calculate motor angles and update states of the leg.
+    
+    :param ee_point: [x, y, z], cm
+    :return motor_angles: [angle0, angle1, angle5], rad
     '''
-    x, y, z = point
+    x, y, z = ee_point
 
     # Calculate the angle of the motor 0
     angle0 = -atan2(z, -y)
@@ -270,31 +320,39 @@ class LegKinematics:
     if angle5 > 0.75 * np.pi or angle5 < 0:
       self.unsafe_reasons.append("angle5 out of range")
 
-    return [angle0, angle1, angle5]
+    motor_angles = [angle0, angle1, angle5]
+    return motor_angles
   
-  def calc_omg2vel(self, omegas):
+  def calc_omg2vel(self, motor_omegas: list[float]) -> list:
     '''
-    Given the angular velocities of the motors, calculate the linear velocity of the end effector.
+    Given angular velocity of the motors, calculate linear velocity of the end effector.
 
-    @param omegas: Angular velocities of the motors, size 3 [omega0, omega1, omega5]
-    @return: Linear velocity of the end effector, size 3 [vx, vy, vz]
+    :param motor_omegas: [omega0, omega1, omega5], rad/s
+    :return ee_velocity: [vx, vy, vz], cm/s
     '''
     J = self.numerical_jacobian()
-    return J @ omegas
+    ee_velocity = J @ motor_omegas
+    return ee_velocity
   
-  def calc_vel2omg(self, velocities):
+  def calc_vel2omg(self, ee_velocity: list[float]) -> list:
     '''
-    Given the linear velocity of the end effector, calculate the angular velocities of the motors.
+    Given linear velocity of the end effector, calculate angular velocity of the motors.
 
-    @param velocities: Linear and angular velocity of the end effector, size 6 [vx, vy, vz, wx, wy, wz]
-    @return: Angular velocities of the motors, size 3 [omega0, omega1, omega5]
+    :param ee_velocity: [vx, vy, vz], cm/s
+    :return motor_omegas: [omega0, omega1, omega5], rad/s
     '''
     J = self.numerical_jacobian()
     J_inv = np.linalg.pinv(J)
-    omegas = J_inv @ np.array(velocities)
-    return omegas
+    motor_omegas = J_inv @ np.array(ee_velocity)
+    return motor_omegas
   
-  def numerical_jacobian(self, delta=1e-5):
+  def numerical_jacobian(self, delta=1e-4) -> list[float]:
+    """
+    Compute jacobian matrix based on current motor angles and position of the end effector.
+
+    :param delta: the perturbation step size, float
+    :return J: shape (3, 3)
+    """
     motor_angles = self._motor_angles
     ee_point = self._ee_point
     J = np.zeros((3, 3))
@@ -305,12 +363,25 @@ class LegKinematics:
       J[0:3, i] = (pe_perturbed - ee_point) / delta
     return J
   
-  def safe_acos(self, x):
+  def safe_acos(self, x) -> float:
+    """
+    Perform safety arccos
+
+    :param x: input value
+    :return: arccos value
+    """
     if x < -1.0 or x > 1.0:
       self.unsafe_reasons.append("acos input out of range")
     return acos(np.clip(x, -1.0, 1.0))
 
-  def safe_norm(self, vec, eps=1e-6):
+  def safe_norm(self, vec, eps=1e-6) -> float:
+    """
+    Perform safety norm
+
+    :param vec: input vector
+    :param eps: epsilon value
+    :return: norm value
+    """
     if np.linalg.norm(vec) < eps:
       self.unsafe_reasons.append("norm input too small")
     return np.linalg.norm(vec) + eps
