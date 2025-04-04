@@ -7,31 +7,31 @@ class LegKinematics:
   
   Attributes
   ----------
-    Ls            : [L0, L1, L2, L3, L4, L5], length of the links, cm
-    _motor_angles : [angle0, angle1, angle5], angle of the motors, rad
-    _ee_point     : [x, y, z], position of the end effector, cm
-    _points       : shape (6, 3), position of the joints, cm
-    _angles       : shape (6,), angle of the joints, rad
-    _ee_velocity  : [vx, vy, vz], linear velocity of the end effector, cm/s
-    _motor_omegas : [omega0, omega1, omega5], angular velocity of the motors, rad/s
-  
+  Ls            : [L0, L1, L2, L3, L4, L5], length of the links, cm
+  _motor_angles : [angle0, angle1, angle5], angle of the motors, rad
+  _ee_point     : [x, y, z], position of the end effector, cm
+  _points       : shape (6, 3), position of the joints, cm
+  _angles       : shape (6,), angle of the joints, rad
+  _ee_velocity  : [vx, vy, vz], linear velocity of the end effector, cm/s
+  _motor_omegas : [omega0, omega1, omega5], angular velocity of the motors, rad/s
+
   Methods
   -------
-    get_motor_angles   : Return current motor angles.
-    set_motor_angles   : Set new motor angles, and update end effector position.
-    get_ee_point       : Return current end effector position.
-    set_ee_point       : Set new end effector position, and update motor angles.
-    get_points         : Return current position of the joints.
-    get_angles         : Return current angle of the joints.
-    get_ee_velocity    : Return current linear velocity of the end effector.
-    set_ee_velocity    : Set new linear velocity of the end effector, and update angular velocity of the motors.
-    get_motor_omegas   : Return current angular velocity of the motors.
-    set_motor_omegas   : Set new angular velocity of the motors, and update linear velocity of the end effector.
-    calc_ang2pnt       : Forward kinematics (motor angles -> end effector position)
-    calc_pnt2ang       : Inverse kinematics (end effector position -> motor angles)
-    calc_omg2vel       : Forward differential kinematics (motor omegas -> end effector velocity)
-    calc_vel2omg       : Inverse differential kinematics (end effector velocity -> motor omegas)
-    numerical_jacobian : Calculate numerical Jacobian matrix for differential kinematics.
+  get_motor_angles   : Return current motor angles.
+  set_motor_angles   : Set new motor angles, and update end effector position.
+  get_ee_point       : Return current end effector position.
+  set_ee_point       : Set new end effector position, and update motor angles.
+  get_points         : Return current position of the joints.
+  get_angles         : Return current angle of the joints.
+  get_ee_velocity    : Return current linear velocity of the end effector.
+  set_ee_velocity    : Set new linear velocity of the end effector, and update angular velocity of the motors.
+  get_motor_omegas   : Return current angular velocity of the motors.
+  set_motor_omegas   : Set new angular velocity of the motors, and update linear velocity of the end effector.
+  calc_ang2pnt       : Forward kinematics (motor angles -> end effector position)
+  calc_pnt2ang       : Inverse kinematics (end effector position -> motor angles)
+  calc_omg2vel       : Forward differential kinematics (motor omegas -> end effector velocity)
+  calc_vel2omg       : Inverse differential kinematics (end effector velocity -> motor omegas)
+  numerical_jacobian : Calculate numerical Jacobian matrix for differential kinematics.
   """
 
   def __init__(self, DEBUG=False):
