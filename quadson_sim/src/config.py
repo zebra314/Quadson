@@ -54,8 +54,3 @@ class Config:
                        self._rl:self._rl_motors,
                        self._rr:self._rr_motors}
     
-    # Gait
-    self.gait_cycle_time = 0.6
-    self.step_length = 14.0
-    self.step_height = 6.0
-    

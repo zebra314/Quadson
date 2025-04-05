@@ -6,8 +6,6 @@ import pybullet as p
 import pybullet_data
 import time
 from src.quadson import Quadson
-from src.interface import Interface
-
 
 def main():
   dt = 1 / 240
@@ -20,8 +18,7 @@ def main():
   p.setTimeStep(dt)
   p.loadURDF("plane.urdf")
   
-  interface = Interface(type='gui', target='orientation')
-  quadson = Quadson(interface)
+  quadson = Quadson()
   while True:
     quadson.step(current_time)
     p.stepSimulation()

@@ -8,17 +8,17 @@ from src.config import Config
 from src.interface import Interface
 from src.leg_group import LegGroup
 from src.body_kinematics import BodyKinematics
-from src.gait import TrajectoryPlanner
+from src.locomotion import Locomotion
 from typing import Dict
 
 class Quadson:
-  def __init__(self, interface: Interface):
+  def __init__(self, interface: Interface = None):
     self.robot_id = p.loadURDF("../assets/whole_body/urdf/quadson_modified.urdf",
                                       basePosition=[0, 0, 0.35],
                                       useFixedBase=False)
     self.config = Config()
     self.body_kinematics = BodyKinematics()
-    self.trajectory_planner = TrajectoryPlanner(gait_type='trot')
+    self.locomotion = Locomotion(gait_type='trot')
     self.interface = interface
     self.joint_dict = self.setup_joint_dict()
     self.leg_group_dict = self.setup_leg_group()
@@ -103,7 +103,7 @@ class Quadson:
     handlers[self.interface.target]()
 
   def step(self, time: float) -> None:
-    ee_points = self.trajectory_planner.get_trajectory(time)
+    ee_points = self.locomotion.get_ee_points(time)
     for leg_name, ee_point in ee_points.items():
       self.leg_group_dict[leg_name].set_ee_point(ee_point)
 
@@ -122,7 +122,7 @@ class Quadson:
 
   def _update_ee_offset(self) -> None:
     self.ee_offset = self.input_dict
-    ee_points = self.trajectory_planner.get_trajectory(self.sim_time)
+    ee_points = self.locomotion.get_ee_points(self.sim_time)
     for leg_name, ee_point in ee_points.items():
       offset = self.ee_offset[leg_name]
       self.leg_group_dict[leg_name].set_ee_point(ee_point+offset)
