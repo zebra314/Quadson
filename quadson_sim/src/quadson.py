@@ -26,7 +26,7 @@ class Quadson:
 
     self.sim_time = 0
     self.time_step = 1/240
-    self.prev_linear_vel = [0, 0, 0]
+    self.linear_vel = [0, 0, 0]
 
     self.cmd_handlers = {
       'motor': self._update_motor,
