@@ -13,6 +13,7 @@ class Locomotion:
     'bound': {'fl': 0.0, 'fr': 0.0, 'rl': 0.5, 'rr': 0.5},
     'gallop': {'fl': 0.1, 'fr': 0.25, 'rl': 0.6, 'rr': 0.75},
   }
+  VALID_GAIT_TYPES = list(PHASE_OFFSETS.keys())
   
   CYCLE_TIMES = {
     'walk': 1.2,
@@ -29,8 +30,6 @@ class Locomotion:
     'bound': 0.4,
     'gallop': 0.35
   }
-
-  VALID_GAIT_TYPES = list(PHASE_OFFSETS.keys())
 
   STEP_HEIGHTS = {
     'walk': 3.0,

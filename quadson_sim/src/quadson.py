@@ -26,8 +26,13 @@ class Quadson:
 
     self.sim_time = 0
     self.time_step = 1/240
-    self.last_linear_vel = [0, 0, 0]
-    self.ee_offset = [] # For ppo model control
+    self.prev_linear_vel = [0, 0, 0]
+
+    self.cmd_handlers = {
+      'motor': self._update_motor,
+      'orientation': self._update_orientation,
+      'ee_offset': self._update_ee_offset, # PPO model input
+    }
 
   def setup_joint_dict(self) -> Dict:
     """
@@ -77,12 +82,12 @@ class Quadson:
   def update(self, cmd_dict=None) -> None:
     # ----------------------------- Update the state ----------------------------- #
     self.sim_time += self.time_step
-    self.last_linear_vel = self.linear_vel
+    self.prev_linear_vel = self.linear_vel
     self.linear_vel, self.angular_vel = p.getBaseVelocity(self.robot_id)
     self.linear_acc = [
-        (self.linear_vel[0] - self.last_linear_vel[0]) / self.time_step,
-        (self.linear_vel[1] - self.last_linear_vel[1]) / self.time_step,
-        (self.linear_vel[2] - self.last_linear_vel[2]) / self.time_step
+        (self.linear_vel[0] - self.prev_linear_vel[0]) / self.time_step,
+        (self.linear_vel[1] - self.prev_linear_vel[1]) / self.time_step,
+        (self.linear_vel[2] - self.prev_linear_vel[2]) / self.time_step
     ]
     self.pos, self.ori = p.getBasePositionAndOrientation(self.robot_id)
     self.euler_ori = p.getEulerFromQuaternion(self.ori)
@@ -94,13 +99,7 @@ class Quadson:
       self.interface.send_cmd()
 
     self.input_dict = self.interface.output_dict[self.interface.target]
-
-    handlers = {
-      'motor': self._update_motor,
-      'orientation': self._update_orientation,
-      'ee_offset': self._update_ee_offset, # PPO model input
-    }
-    handlers[self.interface.target]()
+    self.cmd_handlers[self.interface.target]()
 
   def step(self, time: float) -> None:
     ee_points = self.locomotion.get_ee_points(time)
@@ -121,52 +120,51 @@ class Quadson:
       self.leg_group_dict[leg_name].set_ee_point(ee_point)
 
   def _update_ee_offset(self) -> None:
-    self.ee_offset = self.input_dict
     ee_points = self.locomotion.get_ee_points(self.sim_time)
     for leg_name, ee_point in ee_points.items():
-      offset = self.ee_offset[leg_name]
+      offset = self.input_dict[leg_name]
       self.leg_group_dict[leg_name].set_ee_point(ee_point+offset)
 
 # ------------------------------- PPO Training ------------------------------- #
   def get_observation(self) -> Dict:
-    # Body state
+    # Get body state
     self.linear_vel, self.angular_vel = p.getBaseVelocity(self.robot_id)
     self.pos, self.ori = p.getBasePositionAndOrientation(self.robot_id)
     self.euler_ori = p.getEulerFromQuaternion(self.ori)
 
+    # Round the values
     digits = 5
     pos = self.round_tuple(self.pos, digits)
     linear_vel = self.round_tuple(self.linear_vel, digits)
     angular_vel = self.round_tuple(self.angular_vel, digits)
     euler_ori = self.round_tuple(self.euler_ori, digits)
-    body_state = np.concatenate([pos, euler_ori, linear_vel, angular_vel])
 
-    # Joint state
+    # Get joint state
     joints = []
     for leg_name in self.config.legs:
       motor_angles = self.leg_group_dict[leg_name].get_motor_angles()
       joints.extend(motor_angles)
     joints = np.array(joints)
 
-    # Phase
-    phase = self.trajectory_planner.gait_generator.get_phase(self.sim_time)
+    # Get phase
+    phase = self.locomotion.get_current_phase(self.sim_time)
     phase_list = []
     for leg in self.config.legs:
       phase_list.append(np.sin(phase[leg]))
       phase_list.append(np.cos(phase[leg]))
     phase_list = np.array(phase_list)
 
-    obs = np.concatenate([body_state, joints, phase_list])
+    obs = np.concatenate([pos, euler_ori, linear_vel, angular_vel, joints, phase_list])
     return obs
   
-  def get_linear_velocity(self):
+  def get_linear_velocity(self) -> tuple:
     return self.linear_vel
   
-  def get_orientation_rpy(self):
+  def get_orientation_rpy(self) -> tuple:
     return self.euler_ori
   
-  def get_position(self):
+  def get_position(self) -> tuple:
     return self.pos
   
-  def round_tuple(self, t, digits):
+  def round_tuple(self, t, digits) -> tuple:
     return tuple(round(x, digits) for x in t)

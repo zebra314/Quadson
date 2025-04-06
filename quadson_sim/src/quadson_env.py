@@ -74,14 +74,13 @@ class QuadsonEnv(gym.Env):
     p.stepSimulation()
 
     # Fix the camera
-    basePos, baseOrn = p.getBasePositionAndOrientation(self.robot.robot_id) # Get model position
-    p.resetDebugVisualizerCamera( cameraDistance=0.6, cameraYaw=75, cameraPitch=-20, cameraTargetPosition=basePos) # fix camera onto model
+    basePos, _ = p.getBasePositionAndOrientation(self.robot.robot_id) # Get model position
+    p.resetDebugVisualizerCamera(cameraDistance=0.6, cameraYaw=75, cameraPitch=-20, cameraTargetPosition=basePos) # fix camera onto model
 
     obs = self._get_obs()
     reward = self._get_reward()
     done = self._check_done()
     info = {}
-    terminated = True
     truncated = False
     return obs, reward, done, truncated, info
 
