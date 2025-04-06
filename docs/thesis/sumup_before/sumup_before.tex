@@ -272,7 +272,7 @@ The steps to compute the foot positions in the shoulder frame are as follows:
 \caption{Compute Foot Position in Shoulder Frame}
 \begin{algorithmic}[1]
 \Require End effector positions $p^w_i$, body orientation $(roll, pitch, yaw)$
-\State Compute $T_b$, transformation from body frame to world frame
+\State Compute body-to-world transform, $T_b$
 \For{each leg $i$}
     \State Get shoulder-to-body transform $T_{s_i}^b$ (predefined by geometry)
     \State Compute shoulder-to-world transform, $T_{s_i} = T_b \cdot T_{s_i}^b$
@@ -364,7 +364,46 @@ The cubic Bezier curve is used for the swing phase to smoothly interpolate the l
 
 \section*{Simulation}
 
+After implementing the algorithms, we first test them in python notebook.
+We use \text{matplotlib} to visualize the robot's motion and check if the end-effector positions are correct.
+
+\begin{figure}[H]
+  \centering
+	\includegraphics[width=0.55\linewidth]{../../assets/body_inverse_kinematics.pdf}
+  \caption{Visualized Body Inverse Kinematics}
+  \label{fig:body}
+\end{figure}
+
+And for the differential kinematics, we compare the actual end-effector velocities with the desired velocities to ensure the control is accurate.
+As shown in the figure below, the vector of actual end-effector velocity fits well with the desired velocity.
+
+\begin{figure}[H]
+  \centering
+	\includegraphics[width=\linewidth]{../../assets/differential_kinematics.pdf}
+  \caption{Visualized Differential Kinematics}
+  \label{fig:diff}
+\end{figure}
+
+Next, we move to the simulation in Pybullet.
+Pybullet is a physics engine that allows us to simulate the robot's motion in a realistic environment.
+We first use Blender and its extension, Phobos, to transform the solidwork model into a URDF file.
+Then we load the URDF file into Pybullet and set up the simulation environment.
+
+\begin{figure}[H]
+  \centering
+	\includegraphics[width=0.6\linewidth]{../../assets/pybullet.jpg}
+  \caption{Simulation in Pybullet}
+  \label{fig:bullet}
+\end{figure}
+
+However, Pybullet does not support the closed chain mechanism of the robot. Therefore, we need to 
+cut the each leg into two parts: the upper leg and the lower leg. Then, in the simulation, 
+we use the kinematic algorithm to control the position of all links directly to simulate the
+closed chain mechanism.
+
 \section*{Deep Reinforcement Learning}
+
+\section*{Future Work}
 
 \section*{Conclusion}
 
