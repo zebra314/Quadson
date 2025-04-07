@@ -17,6 +17,7 @@ class QuadsonEnv(gym.Env):
     super().__init__()
 
     p.connect(p.GUI)  # use p.DIRECT when training
+    p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
     p.setGravity(0, 0, -9.81)
     p.setAdditionalSearchPath(pybullet_data.getDataPath())
     p.setTimeStep(1/240)
@@ -109,7 +110,7 @@ class QuadsonEnv(gym.Env):
     roll, pitch, yaw = self.robot.get_orientation_rpy()
     lin_vel = self.robot.get_linear_velocity()
     ang_vel = self.robot.get_angular_velocity()
-    _, _, z = self.robot.get_position()
+    x, y, z = self.robot.get_position()
 
     # Forward velocity
     vel_diff = lin_vel[0] - target_x_vel
@@ -122,21 +123,28 @@ class QuadsonEnv(gym.Env):
     vertical_penalty = 0.5 * lin_vel[2]**2 + 0.3 * ang_vel[2]**2
 
     # Pose stability
-    orientation_penalty = 1.0 * roll**2 + 1.5 * pitch**2 + 0.5 * yaw**2
+    orientation_penalty = 1.7 * roll**2 + 1.5 * pitch**2 + 0.5 * yaw**2
+
+    # Negative x position
+    backward_penalty = 2.0 * np.clip(-lin_vel[0], 0, None)**2
+
+    # Y axis stability
+    y_diff = y
+    y_penalty = 1.0 * y_diff**2
 
     # Height
     height_diff = z - target_height
     height_penalty = 0.5 * height_diff**2
 
     if hasattr(self, 'prev_orientation'):
-        prev_roll, prev_pitch, prev_yaw = self.prev_orientation
-        orientation_change_penalty = (
-            0.5 * (roll - prev_roll)**2 + 
-            0.8 * (pitch - prev_pitch)**2 + 
-            0.3 * (yaw - prev_yaw)**2
-        )
+      prev_roll, prev_pitch, prev_yaw = self.prev_orientation
+      orientation_change_penalty = (
+        1.0 * (roll - prev_roll)**2 + 
+        0.8 * (pitch - prev_pitch)**2 + 
+        0.3 * (yaw - prev_yaw)**2
+      )
     else:
-        orientation_change_penalty = 0
+      orientation_change_penalty = 0
     self.prev_orientation = (roll, pitch, yaw)
 
     if hasattr(self, 'last_action'):
@@ -153,14 +161,16 @@ class QuadsonEnv(gym.Env):
     self.last_action = self.current_action.copy() if hasattr(self, 'current_action') else np.zeros_like(self.action_space.sample())
 
     reward = (
-        + 1.0 * forward_reward           # 前進獎勵
-        - 0.8 * lateral_penalty          # 側向穩定性懲罰
-        - 0.8 * vertical_penalty         # 垂直穩定性懲罰
-        - 0.7 * orientation_penalty      # 姿態穩定性懲罰
+        + 1.0 * forward_reward              # 前進獎勵
+        - 0.8 * lateral_penalty             # 側向穩定性懲罰
+        - 0.8 * vertical_penalty            # 垂直穩定性懲罰
+        - 0.7 * orientation_penalty         # 姿態穩定性懲罰
         - 0.5 * orientation_change_penalty  # 姿態變化率懲罰
-        - 0.5 * height_penalty           # 高度穩定性懲罰
-        - energy_penalty                 # 能量效率懲罰
-        - smoothness_penalty             # 動作平滑度懲罰
+        - 0.5 * backward_penalty            # 後退懲罰
+        - 0.5 * y_penalty                   # Y 軸穩定性懲罰
+        - 0.5 * height_penalty              # 高度穩定性懲罰
+        - energy_penalty                    # 能量效率懲罰
+        - smoothness_penalty                # 動作平滑度懲罰
     )
     
     return reward
@@ -181,7 +191,7 @@ class QuadsonEnv(gym.Env):
     return False
 
 class PlottingCallback(BaseCallback):
-  def __init__(self, window_size=10, verbose=0, update_freq=1):
+  def __init__(self, window_size=25, verbose=0, update_freq=1):
     super().__init__(verbose)
     self.window_size = window_size
     self.update_freq = update_freq
@@ -198,7 +208,7 @@ class PlottingCallback(BaseCallback):
         
   def _on_training_start(self) -> None:
     plt.ion()
-    self.fig, self.ax = plt.subplots(figsize=(10, 6))
+    self.fig, self.ax = plt.subplots(figsize=(6, 4))
     
     # Set the initial plot
     self.ax.set_title("Training Progress", fontsize=14)
@@ -220,7 +230,6 @@ class PlottingCallback(BaseCallback):
     self.current_reward += reward
         
     if done:
-      print(self.current_reward)
       self.episode_count += 1
       self.episode_rewards.append(self.current_reward)
       
@@ -277,7 +286,7 @@ class PlottingCallback(BaseCallback):
     
     # Improve x-axis ticks for better readability
     if len(episodes) > 10:
-      self.ax.set_xticks(np.linspace(1, len(episodes), min(10, len(episodes))))
+      self.ax.set_xticks(np.linspace(1, len(episodes), min(10, len(episodes))).astype(int))
     
     # Update the plot
     self.fig.canvas.draw()
@@ -288,7 +297,7 @@ class PlottingCallback(BaseCallback):
     # Save the final plot
     plt.ioff()
     self._update_plot()
-    plt.savefig("rl_training_progress.png", dpi=150, bbox_inches='tight')
+    plt.savefig("rl_training_progress.pdf", dpi=150, bbox_inches='tight')
     
     if self.verbose:
         print("\nTraining complete. Final plots saved as 'rl_training_progress.png'")
