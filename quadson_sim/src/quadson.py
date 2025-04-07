@@ -23,6 +23,7 @@ class Quadson:
     self.joint_dict = self.setup_joint_dict()
     self.leg_group_dict = self.setup_leg_group()
     self.setup_colors()
+    self.setup_friction()
 
     self.sim_time = 0
     self.time_step = 1/240
@@ -64,6 +65,14 @@ class Quadson:
 
       p.changeVisualShape(self.robot_id, joint_index, rgbaColor=color)
 
+  def setup_friction(self) -> None:
+    for joint_name, joint_index in self.joint_dict.items():
+      if 'joint2' in joint_name.lower():
+        p.changeDynamics(self.robot_id, joint_index,
+                  lateralFriction=1.0,
+                  spinningFriction=0.1,
+                  rollingFriction=0.03)
+        
   def setup_leg_group(self) -> Dict:
     """
     Initialize leg groups dynamically from joint dictionary.
@@ -154,8 +163,11 @@ class Quadson:
       phase_list.append(np.cos(phase[leg]))
     phase_list = np.array(phase_list)
 
-    obs = np.concatenate([pos, euler_ori, linear_vel, angular_vel, joints, phase_list])
+    obs = np.concatenate([euler_ori, linear_vel, angular_vel, joints, phase_list])
     return obs
+  
+  def get_angular_velocity(self) -> tuple:
+    return self.angular_vel
   
   def get_linear_velocity(self) -> tuple:
     return self.linear_vel
