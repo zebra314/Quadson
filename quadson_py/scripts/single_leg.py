@@ -30,6 +30,7 @@ def enfore_closure(theory_angles):
   joint_ctrl(2, j5_env)
 
 p.connect(p.GUI)
+p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
 p.setGravity(0, 0, -9.81)
 robot_id = p.loadURDF("../assets/single_leg/urdf/single_leg.urdf", useFixedBase=True)
 time_step = 1.0 / 240.0

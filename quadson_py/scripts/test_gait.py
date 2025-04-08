@@ -12,6 +12,7 @@ def main():
   current_time = 0.0
   
   p.connect(p.GUI) # (GUI for visualization, DIRECT for headless)
+  p.configureDebugVisualizer(p.COV_ENABLE_GUI,0)
   p.resetSimulation()
   p.setAdditionalSearchPath(pybullet_data.getDataPath())
   p.setGravity(0, 0, -9.81)
