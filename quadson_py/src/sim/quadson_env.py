@@ -3,13 +3,13 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import numpy as np
-from matplotlib import pyplot as plt
 import pybullet as p
 import pybullet_data
+from matplotlib import pyplot as plt
 import gymnasium as gym
 from stable_baselines3.common.callbacks import BaseCallback
-from src.quadson import Quadson
-from src.interface import Interface
+from src.sim.quadson import Quadson
+from src.sim.interface import Interface
 from src.config import Config
 
 class QuadsonEnv(gym.Env):

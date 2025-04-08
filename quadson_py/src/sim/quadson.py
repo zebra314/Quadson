@@ -5,10 +5,10 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pybullet as p
 import numpy as np
 from src.config import Config
-from src.interface import Interface
-from src.leg_group import LegGroup
 from src.body_kinematics import BodyKinematics
 from src.locomotion import Locomotion
+from src.sim.interface import Interface
+from src.sim.leg_group import LegGroup
 from typing import Dict
 
 class Quadson:

@@ -1,6 +1,10 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import numpy as np
 from src.leg_kinematics import LegKinematics
-from src.actuator import Actuator
+from src.sim.actuator import Actuator
 
 class LegGroup:
   def __init__(self, robot_id, joint_indices):

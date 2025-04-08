@@ -5,7 +5,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pybullet as p
 import pybullet_data
 import time
-from src.quadson import Quadson
+from src.sim.quadson import Quadson
 
 def main():
   dt = 1 / 240
