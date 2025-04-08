@@ -403,8 +403,77 @@ closed chain mechanism.
 
 \section*{Deep Reinforcement Learning}
 
+To enhance Quadson’s locomotion stability, we apply deep reinforcement learning (RL) to generate adaptive offsets for the end-effector positions. This section outlines the environment, RL formulation, and training process.
+
+\subsection*{Environment Setup}
+
+We developed a custom Gymnasium environment, \texttt{QuadsonEnv}, using Pybullet for simulation. The environment includes:
+\begin{itemize}
+    \item \textbf{Physics}: Gravity at \(-9.81 \, \text{m/s}^2\), with a plane having friction (lateral: 0.8, spinning: 0.1, rolling: 0.01) and restitution (0.2).
+    \item \textbf{Robot}: Quadson with 12 actuated joints, controlled via end-effector offsets.
+    \item \textbf{Time Step}: \(1/240 \, \text{s}\) for stable simulation.
+\end{itemize}
+The camera follows the robot at a fixed distance (0.8 m), yaw (75°), and pitch (\(-20^\circ\)).
+
+\subsection*{RL Formulation}
+
+The RL problem is defined as follows:
+
+\begin{itemize}
+    \item \textbf{Observation Space}: A 29-dimensional vector:
+    \begin{itemize}
+        \item Body state: roll, pitch, yaw, linear velocity (\(v_x, v_y, v_z\)), angular velocity (\(\omega_x, \omega_y, \omega_z\)) — 9 dimensions.
+        \item Joint state: Positions of 12 joints.
+        \item Leg phases: Sine and cosine of phases for four legs (LF, RF, LH, RH) — 8 dimensions.
+    \end{itemize}
+    \item \textbf{Action Space}: A 12-dimensional vector of end-effector offsets (\(x, y, z\) for each leg), bounded between \(-5\) and \(5\).
+    \item \textbf{Reward Function}: Combines multiple terms:
+    \begin{align*}
+        r = & \, 1.0 \cdot \exp(-0.5 (v_x - 0.5)^2) & \text{(forward velocity)} \\
+            & - 0.8 \cdot (0.5 v_y^2 + 0.3 \omega_y^2) & \text{(lateral penalty)} \\
+            & - 0.8 \cdot (0.5 v_z^2 + 0.3 \omega_z^2) & \text{(vertical penalty)} \\
+            & - 0.7 \cdot (1.7 \text{roll}^2 + 1.5 \text{pitch}^2 + 0.5 \text{yaw}^2) & \text{(orientation penalty)} \\
+            & - 0.5 \cdot \text{(additional terms for stability and efficiency)}.
+    \end{align*}
+    Key goals include maintaining forward speed (\(0.5 \, \text{m/s}\)), height (\(0.2 \, \text{m}\)), and stability.
+    \item \textbf{Termination}: Episode ends if roll or pitch exceeds \(45^\circ\), height drops below \(0.1 \, \text{m}\), or 4000 steps are reached.
+\end{itemize}
+
+\subsection*{Training Process}
+
+We use the Proximal Policy Optimization (PPO) algorithm from Stable Baselines3 due to its stability and sample efficiency. Training occurs in Pybullet with:
+\begin{itemize}
+    \item \textbf{Callback}: A custom \texttt{PlottingCallback} tracks rewards, computes moving averages (window size: 25), and plots progress every episode.
+    \item \textbf{Visualization}: Real-time plots of episode rewards, moving averages, and standard deviations saved as \texttt{rl\_training\_progress.pdf}.
+\end{itemize}
+Hyperparameters (e.g., learning rate, batch size) are under optimization during training.
+
+\subsection*{Preliminary Results}
+
+[Placeholder: Insert results here once training completes.]  
+Training is ongoing. Initial observations suggest the agent learns to stabilize Quadson's gait. Final results will include average reward, stability metrics, and locomotion performance.
+
 \section*{Future Work}
 
+So far, we have implemented and valided kinematic algorithms, 
+setting up a virtual environment for motion testing and reinforcement 
+learning training. The RL model aims to improve locomotion stability with 
+adaptive gait offsets. The next steps are:
+
+\begin{enumerate}
+	\item \textbf{Simulation-to-Reality Transfer}: Deploy algorithms and RL model to the physical robot, deal with factors like friction and motor latency through tuning or domain randomization.
+	\item \textbf{Walking Stability}: Refine RL policy to handle the movement in different terrians, such as slopes or uneven surfaces.
+	\item \textbf{Sensor Integration}: Add IMU or LiDAR for real-time feedback and obstacle detection.
+	\item \textbf{Expanded Locomotion}: Enable movement in various directions other than forward, such as sideways.
+	\item \textbf{Recovery Mechanisms}: Enable self-righting or failure adaptation to protect the robot from falling.
+\end{enumerate}
+
+These steps will transition Quadson from simulation to a functional real-world robot.
+
 \section*{Conclusion}
+
+We developed a kinematic framework for Quadson, covering forward, inverse, differential, and body kinematics, alongside locomotion control. These algorithms were validated in Pybullet, where simulations confirmed accurate end-effector positioning and velocity tracking. 
+To enhance stability, we initiated deep reinforcement learning (RL) with PPO to adjust gait offsets, with training ongoing. Despite Pybullet's limitation with closed-chain mechanisms, we adapted by controlling link positions directly. This work establishes Quadson as a platform for robotic motion studies, 
+blending classical kinematics with RL. The next step is real-world deployment, building on this foundation to achieve practical functionality.
 
 \end{document}
