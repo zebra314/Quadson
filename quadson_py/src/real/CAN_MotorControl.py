@@ -1,6 +1,11 @@
 import sys
+import os
 import time
-from cando import *
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+from src.real.can_config import *
+from src.real.can_interface import Can_motor_manager
+from src.real.leg_tmp import Legs_manager
 
 if __name__ == '__main__':
 	
@@ -22,9 +27,7 @@ if __name__ == '__main__':
 		cmm.send_motor_cmd(2, CAN_STD_TYPE.CAN_STDID_GOAL_REVOLUTION, 0)
 		time.sleep(0.1)
 
-    ######
-    #TEST#    
-    ######
+	# ----------------------------------- Test ----------------------------------- #
 	for x in range(10):
 		lm.leg_manager_leg_update(1)
 		cmm.send_motor_cmd(1, CAN_STD_TYPE.CAN_STDID_GOAL_REVOLUTION, 0)

@@ -1,4 +1,6 @@
-import numpy
+import math
+import numpy as np
+
 class Leg(object):
 	"""docstring for Leg"""
 	def __init__(self, 
@@ -151,8 +153,8 @@ class Leg(object):
 	def leg_status_update(self, angle, omega):
 		self.angle = angle
 		self.omega = omega
-		self.pos = leg_rad2pos(angle)
-		self.vel = leg_vel2omega(angle, omega)
+		self.pos = self.leg_rad2pos(angle)
+		self.vel = self.leg_vel2omega(angle, omega)
 
 	def boundary(self):
 		pass
