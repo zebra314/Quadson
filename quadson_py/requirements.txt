@@ -1,6 +1,7 @@
 absl-py==2.2.2
 AHRS==0.3.1
 ale-py==0.10.2
+cando==1.0.6
 cloudpickle==3.1.1
 contourpy==1.3.1
 cycler==0.12.1
@@ -48,6 +49,7 @@ python-can==4.5.0
 python-can-cando==1.0.7
 python-dateutil==2.9.0.post0
 pytz==2025.2
+pyusb==1.0.2
 rich==14.0.0
 setuptools==78.1.0
 six==1.17.0
