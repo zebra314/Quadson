@@ -29,14 +29,14 @@
 \date{Spring 2025}
 \maketitle
 
-\section*{Introduction}
+\section{Introduction}
 
 Quadson is a 3D printed quadruped robot designed as a platform for exploring advanced robotic motion and control.
 This document includes its forward kinematics, inverse kinematics, differential kinematics and expands to body kinematics and locomotion.
-Following these analysis, we will introduce the process of performing simultion in Pybullet and using deep
+Following the analysis, we will introduce the process of performing simultion in Pybullet and using deep
 reinforcement learning to improve the robot's control and performance.
 
-\section*{Forward Kinematics}
+\section{Forward Kinematics}
 
 For each leg of the robot, we define the reference frame with its origin at point $p_1$. 
 Two motors are positioned at $p_1$ and $p_5$ respectively, and the third motor
@@ -92,8 +92,7 @@ connected to the entire leg assembly, controls the rotation around x axis. The r
 \end{tikzpicture}
 \end{center}
 
-The following algorithm takes the angle of three motors as input and computes the position of the end effector.
-The process incorporates several safety check, prevent configurations that could potentially damage the mechanism.
+The following algorithm takes the angle of three motors as input and computes the position of the end-effector.
 
 \begin{algorithm}[H]
 	\caption{Compute Leg End-Point}
@@ -135,10 +134,10 @@ The process incorporates several safety check, prevent configurations that could
 	\end{algorithmic}
 \end{algorithm}
 
-\section*{Inverse Kinematics}
+\section{Inverse Kinematics}
 
-In real world scenarios, controlling position of the end effector to reach to a certain position
-is often more pratical than setting the angles directly. For example, to move the end effector along 
+In real world scenarios, controlling position of the end-effector to reach to a certain position
+is often more pratical than setting the angles directly. For example, to move the end-effector along 
 a defined trajectory, achieving this by manually adjusting the three motor angles is nearly impossible 
 due to the complexity of the joint movements. 
 
@@ -200,9 +199,9 @@ to compute the angles of the motor corresponding to a given target position.
 	\end{algorithmic}
 \end{algorithm}
 
-\section*{Differential Kinematics}
+\section{Differential Kinematics}
 
-To control a quadruped robot's leg smoothly, we employ differential kinematics, which provides the relation between joint angular velocities and linear velocity of the end effector.
+To control a quadruped robot's leg smoothly, we employ differential kinematics, which provides the relation between joint angular velocities and linear velocity of the end-effector.
 
 Given the motor angles $\boldsymbol{\theta} = [\theta_0, \theta_1, \theta_5]^T$ and their angular velocities $\dot{\boldsymbol{\theta}} = [\omega_0, \omega_1, \omega_5]^T$. 
 The linear velocity of the end-effector $\mathbf{v} = [v_x, v_y, v_z]^T$ can be represented as following:
@@ -245,7 +244,7 @@ $$
 Where $f(\boldsymbol{\theta})$ is the forward kinematics function, $\delta$ is a small perturbation and 
 $\mathbf{e}_i$ is a unit vector along the $i$-th motor axis.
 
-\section*{Body Kinematics}
+\section{Body Kinematics}
 
 To control the body pose of the robot when the legs are in contact with the ground, we take
 the positions of the end-effectors in the world frame and the orientation of the body as inputs.
@@ -271,7 +270,7 @@ The steps to compute the foot positions in the shoulder frame are as follows:
 \begin{algorithm}[H]
 \caption{Compute Foot Position in Shoulder Frame}
 \begin{algorithmic}[1]
-\Require End effector positions $p^w_i$, body orientation $(roll, pitch, yaw)$
+\Require end-effector positions $p^w_i$, body orientation $(roll, pitch, yaw)$
 \State Compute body-to-world transform, $T_b$
 \For{each leg $i$}
     \State Get shoulder-to-body transform $T_{s_i}^b$ (predefined by geometry)
@@ -286,7 +285,7 @@ The steps to compute the foot positions in the shoulder frame are as follows:
 \end{algorithmic}
 \end{algorithm}
 
-\section*{Locomotion}
+\section{Locomotion}
 
 Locomotion control is crucial for quadruped robots to enable them to move efficiently. The motion of the robot depends on the type of gait used, and different gaits have different characteristics such as step height, length, and timing.
 
@@ -340,6 +339,8 @@ The second algorithm computes corresponding end-effector points. The position is
 	\end{algorithmic}
 \end{algorithm}
 
+Duty factor, the fraction of the cycle where the leg is in contact with the ground.
+
 The cubic Bezier curve is used for the swing phase to smoothly interpolate the leg's motion. The following formula is used to calculate the position on the cubic Bezier curve.
 
 \begin{algorithm}[H]
@@ -362,7 +363,7 @@ The cubic Bezier curve is used for the swing phase to smoothly interpolate the l
 	\end{algorithmic}
 \end{algorithm}
 
-\section*{Simulation}
+\section{Simulation}
 
 After implementing the algorithms, we first test them in python notebook.
 We use \text{matplotlib} to visualize the robot's motion and check if the end-effector positions are correct.
@@ -401,11 +402,11 @@ cut the each leg into two parts: the upper leg and the lower leg. Then, in the s
 we use the kinematic algorithm to control the position of all links directly to simulate the
 closed chain mechanism.
 
-\section*{Deep Reinforcement Learning}
+\section{Deep Reinforcement Learning}
 
-To enhance Quadson’s locomotion stability, we apply deep reinforcement learning (RL) to generate adaptive offsets for the end-effector positions. This section outlines the environment, RL formulation, and training process.
+To enhance Quadson's locomotion stability, we apply deep reinforcement learning (RL) to generate adaptive offsets for the end-effector positions. This section outlines the environment, RL formulation, and training process.
 
-\subsection*{Environment Setup}
+\subsection{Environment Setup}
 
 We developed a custom Gymnasium environment, \texttt{QuadsonEnv}, using Pybullet for simulation. The environment includes:
 \begin{itemize}
@@ -413,9 +414,8 @@ We developed a custom Gymnasium environment, \texttt{QuadsonEnv}, using Pybullet
     \item \textbf{Robot}: Quadson with 12 actuated joints, controlled via end-effector offsets.
     \item \textbf{Time Step}: \(1/240 \, \text{s}\) for stable simulation.
 \end{itemize}
-The camera follows the robot at a fixed distance (0.8 m), yaw (75°), and pitch (\(-20^\circ\)).
 
-\subsection*{RL Formulation}
+\subsection{RL Formulation}
 
 The RL problem is defined as follows:
 
@@ -426,34 +426,70 @@ The RL problem is defined as follows:
         \item Joint state: Positions of 12 joints.
         \item Leg phases: Sine and cosine of phases for four legs (LF, RF, LH, RH) — 8 dimensions.
     \end{itemize}
-    \item \textbf{Action Space}: A 12-dimensional vector of end-effector offsets (\(x, y, z\) for each leg), bounded between \(-5\) and \(5\).
+    \item \textbf{Action Space}: A 12-dimensional vector of end-effector offsets (\(x, y, z\) for each leg), bounded between \(-5\) and \(5\) cm.
     \item \textbf{Reward Function}: Combines multiple terms:
     \begin{align*}
-        r = & \, 1.0 \cdot \exp(-0.5 (v_x - 0.5)^2) & \text{(forward velocity)} \\
-            & - 0.8 \cdot (0.5 v_y^2 + 0.3 \omega_y^2) & \text{(lateral penalty)} \\
-            & - 0.8 \cdot (0.5 v_z^2 + 0.3 \omega_z^2) & \text{(vertical penalty)} \\
-            & - 0.7 \cdot (1.7 \text{roll}^2 + 1.5 \text{pitch}^2 + 0.5 \text{yaw}^2) & \text{(orientation penalty)} \\
-            & - 0.5 \cdot \text{(additional terms for stability and efficiency)}.
+			r = & \, 1.0 \cdot \exp(-0.5 (v_x - 0.5)^2) & \text{(forward velocity)} \\
+					& - 0.8 \cdot (0.5 v_y^2 + 0.3 \omega_y^2) & \text{(lateral penalty)} \\
+					& - 0.8 \cdot (0.5 v_z^2 + 0.3 \omega_z^2) & \text{(vertical penalty)} \\
+					& - 0.7 \cdot (1.7 \text{roll}^2 + 1.5 \text{pitch}^2 + 0.5 \text{yaw}^2) & \text{(orientation penalty)} \\
+					& - 0.5 \cdot \text{(additional terms for stability and efficiency)}.
     \end{align*}
     Key goals include maintaining forward speed (\(0.5 \, \text{m/s}\)), height (\(0.2 \, \text{m}\)), and stability.
     \item \textbf{Termination}: Episode ends if roll or pitch exceeds \(45^\circ\), height drops below \(0.1 \, \text{m}\), or 4000 steps are reached.
 \end{itemize}
 
-\subsection*{Training Process}
+\subsection{Training Process}
 
 We use the Proximal Policy Optimization (PPO) algorithm from Stable Baselines3 due to its stability and sample efficiency. Training occurs in Pybullet with:
 \begin{itemize}
-    \item \textbf{Callback}: A custom \texttt{PlottingCallback} tracks rewards, computes moving averages (window size: 25), and plots progress every episode.
+    \item \textbf{Callback}: A custom \texttt{PlottingCallback} tracks rewards, computes moving averages, and plots progress every episode.
     \item \textbf{Visualization}: Real-time plots of episode rewards, moving averages, and standard deviations saved as \texttt{rl\_training\_progress.pdf}.
 \end{itemize}
 Hyperparameters (e.g., learning rate, batch size) are under optimization during training.
 
-\subsection*{Preliminary Results}
+\begin{figure}[H]
+  \centering
+	\includegraphics[width=0.6\linewidth]{../../assets/rl_training_progress.pdf}
+  \caption{Reward}
+  \label{fig:reward}
+\end{figure}
 
-[Placeholder: Insert results here once training completes.]  
+\subsection{Preliminary Results}
+
 Training is ongoing. Initial observations suggest the agent learns to stabilize Quadson's gait. Final results will include average reward, stability metrics, and locomotion performance.
 
-\section*{Future Work}
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{\textwidth}
+    \includegraphics[width=0.9\linewidth]{../../assets/alg_vel.pdf}
+    \caption{Locomotion Alogrithm}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{\textwidth}
+    \includegraphics[width=0.9\linewidth]{../../assets/model_vel.pdf}
+    \caption{RL Model}
+  \end{subfigure}
+  \caption{Velocity Comparision of Different Control Method Over a 3-Second Trial.}
+  \label{fig:compare_vel}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{\textwidth}
+    \includegraphics[width=0.9\linewidth]{../../assets/alg_ori.pdf}
+    \caption{Locomotion Alogrithm}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{\textwidth}
+    \includegraphics[width=0.9\linewidth]{../../assets/model_ori.pdf}
+    \caption{RL Model}
+  \end{subfigure}
+  \caption{Orientation Comparision of Different Control Method Over a 3-Second Trial.}
+  \label{fig:compare_ori}
+\end{figure}
+
+\section{Future Work}
 
 So far, we have implemented and valided kinematic algorithms, 
 setting up a virtual environment for motion testing and reinforcement 
@@ -470,7 +506,7 @@ adaptive gait offsets. The next steps are:
 
 These steps will transition Quadson from simulation to a functional real-world robot.
 
-\section*{Conclusion}
+\section{Conclusion}
 
 We developed a kinematic framework for Quadson, covering forward, inverse, differential, and body kinematics, alongside locomotion control. These algorithms were validated in Pybullet, where simulations confirmed accurate end-effector positioning and velocity tracking. 
 To enhance stability, we initiated deep reinforcement learning (RL) with PPO to adjust gait offsets, with training ongoing. Despite Pybullet's limitation with closed-chain mechanisms, we adapted by controlling link positions directly. This work establishes Quadson as a platform for robotic motion studies, 

@@ -31,10 +31,9 @@ def plot_stability(times, observations, metrics):
   euler_ori = np.array(observations['euler_ori'])
   linear_vel = np.array(observations['linear_vel'])
 
-  plt.figure(figsize=(12, 8))
 
   # Plot 1: Orientation (Roll and Pitch only)
-  plt.subplot(3, 1, 1)
+  plt.figure(figsize=(10, 4))
   plt.plot(times, euler_ori[:, 0], label=f"Roll (std={metrics['roll_std']:.4f})")
   plt.plot(times, euler_ori[:, 1], label=f"Pitch (std={metrics['pitch_std']:.4f})")
   plt.xlabel("Time (s)")
@@ -43,17 +42,22 @@ def plot_stability(times, observations, metrics):
   plt.legend()
   plt.grid(True)
 
+  plt.tight_layout()
+  plt.show()
+
   # Plot 2: Height (Z Position)
-  plt.subplot(3, 1, 2)
-  plt.plot(times, pos[:, 2], label=f"Height (std={metrics['height_std']:.4f})")
-  plt.xlabel("Time (s)")
-  plt.ylabel("Height (m)")
-  plt.title("Height Over Time")
-  plt.legend()
-  plt.grid(True)
+  # plt.plot(times, pos[:, 2], label=f"Height (std={metrics['height_std']:.4f})")
+  # plt.xlabel("Time (s)")
+  # plt.ylabel("Height (m)")
+  # plt.title("Height Over Time")
+  # plt.legend()
+  # plt.grid(True)
+
+  # plt.tight_layout()
+  # plt.show()
 
   # Plot 3: Linear Velocity (X and Z only)
-  plt.subplot(3, 1, 3)
+  plt.figure(figsize=(10, 4))
   plt.plot(times, linear_vel[:, 0], label=f"Vx (std={metrics['linear_vel_x_std']:.4f})")
   plt.plot(times, linear_vel[:, 2], label=f"Vz (std={metrics['linear_vel_z_std']:.4f})")
   plt.xlabel("Time (s)")
