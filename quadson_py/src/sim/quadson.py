@@ -14,7 +14,7 @@ from typing import Dict
 class Quadson:
   def __init__(self, interface: Interface = None):
     self.robot_id = p.loadURDF("../assets/whole_body/urdf/quadson_modified.urdf",
-                                      basePosition=[0, 0, 0.35],
+                                      basePosition=[0, 0, 0.2],
                                       useFixedBase=False)
     self.config = Config()
     self.body_kinematics = BodyKinematics()

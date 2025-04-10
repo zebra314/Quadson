@@ -6,7 +6,7 @@ from stable_baselines3 import PPO
 from src.sim.quadson_env import QuadsonEnv, PlottingCallback
 env = QuadsonEnv()
 # model = PPO("MlpPolicy", env, verbose=1)
-model = PPO('MlpPolicy', env, verbose=1, learning_rate=5e-5, n_steps=2048, batch_size=256)
+model = PPO('MlpPolicy', env, verbose=0, learning_rate=5e-5, n_steps=2048, batch_size=256, device='cpu')
 plotting_callback = PlottingCallback()
-model.learn(total_timesteps=4000000, callback=plotting_callback)
+model.learn(total_timesteps=5000000, callback=plotting_callback)
 model.save("quadson_ppo")

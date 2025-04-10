@@ -37,7 +37,7 @@ class QuadsonEnv(gym.Env):
 
     self.rewards = []
     self.step_counter = 0
-    self.max_steps = 4000
+    self.max_steps = 4500
 
     # Observation space
     # body_state:
@@ -83,8 +83,8 @@ class QuadsonEnv(gym.Env):
 
     # Fix the camera
     basePos, _ = p.getBasePositionAndOrientation(self.robot.robot_id) # Get model position
-    p.resetDebugVisualizerCamera(cameraDistance=0.8, cameraYaw=75, cameraPitch=-20, cameraTargetPosition=basePos) # fix camera onto model
-    
+    p.resetDebugVisualizerCamera(cameraDistance=0.8, cameraYaw=50, cameraPitch=-20, cameraTargetPosition=basePos) # fix camera onto model
+
     self.step_counter += 1
     self.current_action = action
 
@@ -123,14 +123,14 @@ class QuadsonEnv(gym.Env):
     vertical_penalty = 0.5 * lin_vel[2]**2 + 0.3 * ang_vel[2]**2
 
     # Pose stability
-    orientation_penalty = 1.7 * roll**2 + 1.5 * pitch**2 + 0.5 * yaw**2
+    orientation_penalty = 2.5 * roll**2 + 1.5 * pitch**2 + 0.5 * yaw**2
 
     # Negative x position
     backward_penalty = 2.0 * np.clip(-lin_vel[0], 0, None)**2
 
     # Y axis stability
     y_diff = y
-    y_penalty = 1.0 * y_diff**2
+    y_penalty = 1.3 * y_diff**2
 
     # Height
     height_diff = z - target_height
@@ -139,7 +139,7 @@ class QuadsonEnv(gym.Env):
     if hasattr(self, 'prev_orientation'):
       prev_roll, prev_pitch, prev_yaw = self.prev_orientation
       orientation_change_penalty = (
-        1.0 * (roll - prev_roll)**2 + 
+        1.2 * (roll - prev_roll)**2 + 
         0.8 * (pitch - prev_pitch)**2 + 
         0.3 * (yaw - prev_yaw)**2
       )
@@ -164,8 +164,8 @@ class QuadsonEnv(gym.Env):
         + 1.0 * forward_reward              # 前進獎勵
         - 0.8 * lateral_penalty             # 側向穩定性懲罰
         - 0.8 * vertical_penalty            # 垂直穩定性懲罰
-        - 0.7 * orientation_penalty         # 姿態穩定性懲罰
-        - 0.5 * orientation_change_penalty  # 姿態變化率懲罰
+        - 0.9 * orientation_penalty         # 姿態穩定性懲罰
+        - 0.8 * orientation_change_penalty  # 姿態變化率懲罰
         - 0.5 * backward_penalty            # 後退懲罰
         - 0.5 * y_penalty                   # Y 軸穩定性懲罰
         - 0.5 * height_penalty              # 高度穩定性懲罰
