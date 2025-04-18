@@ -2,27 +2,23 @@ import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 import struct
+import threading
 import math
-from src.real.can_config import *
-
 import time
 from cando import *
+from src.real.can_config import *
 
 
 dev_lists = list_scan()
 
-
 if len(dev_lists):
-    for dev in dev_lists:
-
-        serial_number = dev_get_serial_number_str(dev)
-
-        dev_info = dev_get_dev_info_str(dev)
-
-        print("Serial Number: " + serial_number + ', Dev Info: ' + dev_info)
+	for dev in dev_lists:
+		serial_number = dev_get_serial_number_str(dev)
+		dev_info = dev_get_dev_info_str(dev)
+		print("Serial Number: " + serial_number + ', Dev Info: ' + dev_info)
 else:
-    print("Device not found!")
-    sys.exit(0)
+	print("Device not found!")
+	sys.exit(0)
 
 ID_STD_OFFSET = 6
 ID_EXT_OFFSET = 24
@@ -59,8 +55,6 @@ def msg_error(rec_frame):
 
 	else:
 		return False
-
-
 
 class Can_msg_package(object):
 	def __init__(self, motor_id, id_type, msg_id, data):
@@ -116,13 +110,8 @@ class Can_motor(object):
 				self.params[CMD_TYPE.MOVING.value] = value
 
 	def can_motor_get_param(self, param_id):
-
 		return self.params[param_id.value]
 
-
-
-import threading	
-import os	
 class Can_motor_manager(object):
 	def __init__(self):
 		self.dev_lists = None
@@ -238,7 +227,6 @@ class Can_motor_manager(object):
 				else:
 					print("reading error")
 					self.disconnect_can_device()
-
 
 	def send_motor_cmd(self, motor_index, cmd, value):
 
