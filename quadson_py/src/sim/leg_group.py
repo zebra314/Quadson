@@ -4,12 +4,12 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')
 
 import numpy as np
 from src.leg_kinematics import LegKinematics
-from src.sim.actuator import Actuator
+from src.sim.motor import Motor
 
 class LegGroup:
   def __init__(self, robot_id, joint_indices):
     self.robot_id = robot_id
-    self.actuators = [Actuator(robot_id, joint_index) for joint_index in joint_indices]
+    self.motors = [Motor(robot_id, joint_index) for joint_index in joint_indices]
     self.leg_kinematics = LegKinematics()
     self.leg_kinematics.set_motor_angles([0, np.pi, np.pi/2]) # initial motor angles
 
@@ -17,8 +17,8 @@ class LegGroup:
     self.leg_kinematics.set_motor_angles(motor_angles)
     theory_angles = self.leg_kinematics.get_angles()
     env_angles = self.get_env_angles(theory_angles)
-    for actuator, motor_angle in zip(self.actuators, env_angles):
-      actuator.set_angle(motor_angle)
+    for motor, motor_angle in zip(self.motors, env_angles):
+      motor.set_angle(motor_angle)
 
   def get_env_angles(self, theory_angles):
     # Active motor

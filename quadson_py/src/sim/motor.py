@@ -1,6 +1,6 @@
 import pybullet as p
 
-class Actuator:
+class Motor:
   def __init__(self, robot_id, joint_index):
     self.robot_id = robot_id
     self.joint_index = joint_index
