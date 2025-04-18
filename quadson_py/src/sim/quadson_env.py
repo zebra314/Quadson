@@ -123,7 +123,7 @@ class QuadsonEnv(gym.Env):
     vertical_penalty = 0.5 * lin_vel[2]**2 + 0.3 * ang_vel[2]**2
 
     # Pose stability
-    orientation_penalty = 2.5 * roll**2 + 1.5 * pitch**2 + 0.5 * yaw**2
+    orientation_penalty = 40 * roll**2 + 30 * pitch**2 + 5 * yaw**2
 
     # Negative x position
     backward_penalty = 2.0 * np.clip(-lin_vel[0], 0, None)**2
@@ -164,15 +164,27 @@ class QuadsonEnv(gym.Env):
         + 1.0 * forward_reward              # 前進獎勵
         - 0.8 * lateral_penalty             # 側向穩定性懲罰
         - 0.8 * vertical_penalty            # 垂直穩定性懲罰
-        - 0.9 * orientation_penalty         # 姿態穩定性懲罰
-        - 0.8 * orientation_change_penalty  # 姿態變化率懲罰
+        - 1.0 * orientation_penalty         # 姿態穩定性懲罰
+        - 1.0 * orientation_change_penalty  # 姿態變化率懲罰
         - 0.5 * backward_penalty            # 後退懲罰
         - 0.5 * y_penalty                   # Y 軸穩定性懲罰
         - 0.5 * height_penalty              # 高度穩定性懲罰
         - energy_penalty                    # 能量效率懲罰
-        - smoothness_penalty                # 動作平滑度懲罰
+        - 0.3 * smoothness_penalty          # 動作平滑度懲罰
     )
-    
+
+    # print('\n')
+    # print('forward_reward            : ', forward_reward            )  
+    # print('lateral_penalty           : ', lateral_penalty           )  
+    # print('vertical_penalty          : ', vertical_penalty          )  
+    # print('orientation_penalty       : ', orientation_penalty       )  
+    # print('orientation_change_penalty: ', orientation_change_penalty)  
+    # print('backward_penalty          : ', backward_penalty          )  
+    # print('y_penalty                 : ', y_penalty                 )  
+    # print('height_penalty            : ', height_penalty            )  
+    # print('energy_penalty            : ', energy_penalty            )        
+    # print('smoothness_penalty        : ', smoothness_penalty        )        
+        
     return reward
 
   def _check_done(self):
