@@ -1,5 +1,5 @@
 \documentclass[a4paper,11pt]{article}
-
+\usepackage[a4paper, margin=2.5cm]{geometry}
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{caption}
@@ -9,7 +9,6 @@
 \usepackage{pgfplots}
 \usepackage{ffcode}
 \usepackage{booktabs}
-\usepackage{listings}
 \usepackage{xcolor}
 \usepackage{listings}
 \usepackage{array}
@@ -156,9 +155,9 @@ to compute the angles of the motor corresponding to a given target position.
 			$$
 				R_{\theta_0} =
 					\begin{bmatrix}
-							1 & 0 & 0 \\
-							0 & \cos(-\theta_0) & -\sin(-\theta_0) \\
-							0 & \sin(-\theta_0) & \cos(-\theta_0)
+						1 & 0 & 0 \\
+						0 & \cos(-\theta_0) & -\sin(-\theta_0) \\
+						0 & \sin(-\theta_0) & \cos(-\theta_0)
 					\end{bmatrix}
 			$$
 			$$
@@ -166,34 +165,34 @@ to compute the angles of the motor corresponding to a given target position.
 			$$
 			\State Calculate angle 1:
 			$$
-					L_{1e} = \| (x', y') \|, \quad
-					\theta_{e15} = \tan^{-1} \left( \frac{-y'}{x'} \right)
+				L_{1e} = \| (x', y') \|, \quad
+				\theta_{e15} = \tan^{-1} \left( \frac{-y'}{x'} \right)
 			$$
 			$$
-					\theta_{e12} = \cos^{-1} \left( \frac{L_1^2 + L_{1e}^2 - (L_2 + L_3)^2}{2 L_1 L_{1e}} \right)
+				\theta_{e12} = \cos^{-1} \left( \frac{L_1^2 + L_{1e}^2 - (L_2 + L_3)^2}{2 L_1 L_{1e}} \right)
 			$$
 			$$
-					\theta_1 = \theta_{e15} + \theta_{e12}
+				\theta_1 = \theta_{e15} + \theta_{e12}
 			$$
 			\State Compute positions of joints:
 			$$
-					p_1 = (0, 0), \quad
-					p_2 = (L_1 \cos \theta_1, -L_1 \sin \theta_1)
+				p_1 = (0, 0), \quad
+				p_2 = (L_1 \cos \theta_1, -L_1 \sin \theta_1)
 			$$
 			$$
-					p_3 = \frac{(pe_2d \cdot L_2) + (p_2 \cdot L_3)}{L_2 + L_3}, \quad
-					p_5 = (L_0, 0)
+				p_3 = \frac{(pe_2d \cdot L_2) + (p_2 \cdot L_3)}{L_2 + L_3}, \quad
+				p_5 = (L_0, 0)
 			$$
 			\State Calculate angle 5:
 			$$
 				\theta_{350} = \tan^{-1} \left( \frac{-p_3[1]}{L_0 - p_3[0]} \right)
 			$$
 			$$
-					\theta_{354} = \cos^{-1} \left( \frac{L_{35}^2 + L_5^2 - L_4^2}{2 L_{35} L_5} \right), \quad
-					L_{35} = \| p_3 - p_5 \|
+				\theta_{354} = \cos^{-1} \left( \frac{L_{35}^2 + L_5^2 - L_4^2}{2 L_{35} L_5} \right), \quad
+				L_{35} = \| p_3 - p_5 \|
 			$$
 			$$
-					\theta_5 = \pi - (\theta_{350} + \theta_{354})
+				\theta_5 = \pi - (\theta_{350} + \theta_{354})
 			$$
 			\State \Return $(\theta_0, \theta_1, \theta_5)$
 	\end{algorithmic}
@@ -214,7 +213,7 @@ Where $\mathbf{J}(\boldsymbol{\theta}) \in \mathbf{R}^{3 \times 3}$ is the Jacob
 changes during motion even if the given linear velocity remain the same.
 Note that angular velocity of the end-effector ($\omega_x, \omega_y, \omega_z$) is ignored because the foot contact does not require rotational control in this context.
 
-To find the inverse, the required motor angular velocities for a desired end-effector linear velocity:
+To find the inverse, the required motor angular velocities for a desired end-effector linear velocity can be represented as following:
 
 $$
 \dot{\boldsymbol{\theta}} = \mathbf{J}^{+}(\boldsymbol{\theta}) \cdot \mathbf{v}
@@ -404,7 +403,7 @@ closed chain mechanism.
 
 \section{Deep Reinforcement Learning}
 
-To enhance Quadson's locomotion stability, we apply deep reinforcement learning (RL) to generate adaptive offsets for the end-effector positions. This section outlines the environment, RL formulation, and training process.
+To improve Quadson's locomotion stability, we apply deep reinforcement learning with PPO algorithm to generate adaptive offsets for the end-effector positions. This section includes the environment, RL formulation, and training process.
 
 \subsection{Environment Setup}
 
@@ -432,76 +431,86 @@ The RL problem is defined as follows:
 			r = & \, 1.0 \cdot \exp(-0.5 (v_x - 0.5)^2) & \text{(forward velocity)} \\
 					& - 0.8 \cdot (0.5 v_y^2 + 0.3 \omega_y^2) & \text{(lateral penalty)} \\
 					& - 0.8 \cdot (0.5 v_z^2 + 0.3 \omega_z^2) & \text{(vertical penalty)} \\
-					& - 0.7 \cdot (1.7 \text{roll}^2 + 1.5 \text{pitch}^2 + 0.5 \text{yaw}^2) & \text{(orientation penalty)} \\
+					& - 1.0 \cdot (40 \text{roll}^2 + 30 \text{pitch}^2 + 5 \text{yaw}^2) & \text{(orientation penalty)} \\
 					& - 0.5 \cdot \text{(additional terms for stability and efficiency)}.
     \end{align*}
-    Key goals include maintaining forward speed (\(0.5 \, \text{m/s}\)), height (\(0.2 \, \text{m}\)), and stability.
-    \item \textbf{Termination}: Episode ends if roll or pitch exceeds \(45^\circ\), height drops below \(0.1 \, \text{m}\), or 4000 steps are reached.
+    Key goals include maintaining forward speed (\(0.5 \, \text{m/s}\)), height (\(0.2 \, \text{m}\)), and reduce the body orientation change during moving.
+    \item \textbf{Termination}: Episode ends if roll or pitch exceeds \(45^\circ\), height drops below \(0.1 \, \text{m}\), or 4500 steps are reached.
 \end{itemize}
 
 \subsection{Training Process}
 
-We use the Proximal Policy Optimization (PPO) algorithm from Stable Baselines3 due to its stability and sample efficiency. Training occurs in Pybullet with:
-\begin{itemize}
-    \item \textbf{Callback}: A custom \texttt{PlottingCallback} tracks rewards, computes moving averages, and plots progress every episode.
-    \item \textbf{Visualization}: Real-time plots of episode rewards, moving averages, and standard deviations saved as \texttt{rl\_training\_progress.pdf}.
-\end{itemize}
+We use the Proximal Policy Optimization (PPO) algorithm from Stable Baselines3 due to its stability and sample efficiency.
 Hyperparameters (e.g., learning rate, batch size) are under optimization during training.
 
 \begin{figure}[H]
   \centering
-	\includegraphics[width=0.6\linewidth]{../../assets/rl_training_progress.pdf}
+	\includegraphics[width=0.5\linewidth]{../../assets/rl_training_progress.pdf}
   \caption{Reward}
   \label{fig:reward}
 \end{figure}
 
-\subsection{Preliminary Results}
+\subsection{Results}
 
-Training is ongoing. Initial observations suggest the agent learns to stabilize Quadson's gait. Final results will include average reward, stability metrics, and locomotion performance.
+In the training, the agent performs 5000000 steps in total to interact with enviroment and update the network. 
+Figure \ref{fig:compare_vel} shows that the forward velocity (vx) has increased, but it still not achieve the target velocity of 0.5m/s.
+This could be due to limitations in the locomotion settings, where the model can only adjust the position of the end effector. To achieve the desired velocity, 
+further tuning to the gait's length and timing is needed.
+
+For vertical velocity (vz), both standard deviation and average have decreased slightly. Although the improvement is not significant but it still represents progress.
+To further improve the stability, we may need to fine-tune the reward function or increase the depth of the deep network.
+
+\begin{figure}[H]
+	\centering
+	\begin{subfigure}[b]{0.7\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{../../assets/alg_vel.pdf}
+			\caption{Locomotion Algorithm}
+	\end{subfigure}
+	\vfill
+	\begin{subfigure}[b]{0.7\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{../../assets/model_vel.pdf}
+			\caption{DRL Model}
+	\end{subfigure}
+	\caption{Velocity Comparison of Different Control Methods Over a 3-Second Trial.}
+	\label{fig:compare_vel}
+\end{figure}
+
+Regarding the orientation stability, there's a significant improvement. As shown in Figure \ref{fig:compare_ori},
+both the roll and pitch averages are now close to zero, with their standard deviations reduced by over 80\%.
 
 \begin{figure}[H]
 	\centering
 	\begin{subfigure}[b]{\textwidth}
-    \includegraphics[width=0.9\linewidth]{../../assets/alg_vel.pdf}
-    \caption{Locomotion Alogrithm}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{\textwidth}
-    \includegraphics[width=0.9\linewidth]{../../assets/model_vel.pdf}
-    \caption{RL Model}
-  \end{subfigure}
-  \caption{Velocity Comparision of Different Control Method Over a 3-Second Trial.}
-  \label{fig:compare_vel}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \begin{subfigure}[b]{\textwidth}
-    \includegraphics[width=0.9\linewidth]{../../assets/alg_ori.pdf}
-    \caption{Locomotion Alogrithm}
-  \end{subfigure}
-  \hfill
-  \begin{subfigure}[b]{\textwidth}
-    \includegraphics[width=0.9\linewidth]{../../assets/model_ori.pdf}
-    \caption{RL Model}
-  \end{subfigure}
-  \caption{Orientation Comparision of Different Control Method Over a 3-Second Trial.}
-  \label{fig:compare_ori}
+		\centering
+		\includegraphics[width=0.7\linewidth]{../../assets/alg_ori.pdf}
+		\caption{Locomotion Alogrithm}
+	\end{subfigure}
+	\vfill
+	\begin{subfigure}[b]{\textwidth}
+		\centering
+		\includegraphics[width=0.7\linewidth]{../../assets/model_ori.pdf}
+		\caption{RL Model}
+	\end{subfigure}
+	\caption{Orientation Comparision of Different Control Method Over a 3-Second Trial.}
+	\label{fig:compare_ori}
 \end{figure}
 
 \section{Future Work}
 
 So far, we have implemented and valided kinematic algorithms, 
 setting up a virtual environment for motion testing and reinforcement 
-learning training. The RL model aims to improve locomotion stability with 
+learning training. The Deep RL model aims to improve locomotion stability with 
 adaptive gait offsets. The next steps are:
 
 \begin{enumerate}
-	\item \textbf{Simulation-to-Reality Transfer}: Deploy algorithms and RL model to the physical robot, deal with factors like friction and motor latency through tuning or domain randomization.
+	\item \textbf{Simulation-to-Reality Transfer}: Deploy algorithms and model to the physical robot, deal with factors like friction and motor latency through tuning or domain randomization.
 	\item \textbf{Walking Stability}: Refine RL policy to handle the movement in different terrians, such as slopes or uneven surfaces.
 	\item \textbf{Sensor Integration}: Add IMU or LiDAR for real-time feedback and obstacle detection.
 	\item \textbf{Expanded Locomotion}: Enable movement in various directions other than forward, such as sideways.
 	\item \textbf{Recovery Mechanisms}: Enable self-righting or failure adaptation to protect the robot from falling.
+	\item \textbf{Migrate to Isaac Gym}: Transition the simulation environment to Isaac Gym for better scalability and performance, using its advanced physics engine and GPU acceleration for more efficient training and testing.
 \end{enumerate}
 
 These steps will transition Quadson from simulation to a functional real-world robot.
@@ -509,7 +518,7 @@ These steps will transition Quadson from simulation to a functional real-world r
 \section{Conclusion}
 
 We developed a kinematic framework for Quadson, covering forward, inverse, differential, and body kinematics, alongside locomotion control. These algorithms were validated in Pybullet, where simulations confirmed accurate end-effector positioning and velocity tracking. 
-To enhance stability, we initiated deep reinforcement learning (RL) with PPO to adjust gait offsets, with training ongoing. Despite Pybullet's limitation with closed-chain mechanisms, we adapted by controlling link positions directly. This work establishes Quadson as a platform for robotic motion studies, 
-blending classical kinematics with RL. The next step is real-world deployment, building on this foundation to achieve practical functionality.
+To enhance stability, we initiated deep reinforcement learning with PPO to adjust gait offsets, with training ongoing. Despite Pybullet's limitation with closed-chain mechanisms, we adapted by controlling link positions directly. This work establishes Quadson as a platform for robotic motion studies, 
+blending classical kinematics with Deep RL. The next step is real-world deployment, building on this foundation to achieve practical functionality.
 
 \end{document}
