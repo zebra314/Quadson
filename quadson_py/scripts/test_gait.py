@@ -28,22 +28,23 @@ def main():
     'linear_vel': [],
   }
   times = []
-  steps = 720
+  steps = 960
   for step in range(steps):
     quadson.step(current_time)
     p.stepSimulation()
 
-    # Get observation
-    obs = quadson.get_observation()
-    euler_ori = obs[0:3]  # roll, pitch, yaw
-    linear_vel = obs[3:6]  # x, y, z velocity
-    pos, _ = p.getBasePositionAndOrientation(quadson.robot_id)
+    if step > 240:
+      # Get observation
+      obs = quadson.get_observation()
+      euler_ori = obs[0:3]  # roll, pitch, yaw
+      linear_vel = obs[3:6]  # x, y, z velocity
+      pos, _ = p.getBasePositionAndOrientation(quadson.robot_id)
 
-    # Store reduced data
-    observations['pos'].append(pos)
-    observations['euler_ori'].append(euler_ori)
-    observations['linear_vel'].append(linear_vel)
-    times.append(step * (1/240))  # Time in seconds
+      # Store reduced data
+      observations['pos'].append(pos)
+      observations['euler_ori'].append(euler_ori)
+      observations['linear_vel'].append(linear_vel)
+      times.append(step * (1/240))  # Time in seconds
 
     current_time += dt
     time.sleep(dt)

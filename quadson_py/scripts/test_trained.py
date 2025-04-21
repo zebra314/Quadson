@@ -39,7 +39,7 @@ observations = {
 times = []
 
 # Run the model
-steps = 720
+steps = 960
 for step in range(steps):
   action, _states = model.predict(obs, deterministic=True)
   cmd_dict = {}
@@ -57,10 +57,11 @@ for step in range(steps):
   pos, _ = p.getBasePositionAndOrientation(robot.robot_id)
 
   # Store reduced data
-  observations['pos'].append(pos)
-  observations['euler_ori'].append(euler_ori)
-  observations['linear_vel'].append(linear_vel)
-  times.append(step * (1/240))  # Time in seconds
+  if step > 240:
+    observations['pos'].append(pos)
+    observations['euler_ori'].append(euler_ori)
+    observations['linear_vel'].append(linear_vel)
+    times.append(step * (1/240))  # Time in seconds
 
   # Fixed camera position relative to the robot
   base_pos, _ = p.getBasePositionAndOrientation(robot.robot_id)
