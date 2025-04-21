@@ -19,6 +19,28 @@
 
 \pgfplotsset{compat=1.18} 
 
+\makeatletter
+\newenvironment{breakablealgorithm}
+{% \begin{breakablealgorithm}
+\begin{center} %
+\refstepcounter{algorithm}% New algorithm
+%\hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+\hrule height.8pt depth0pt \kern2pt% \@fs@pre for \@fs@ruled
+\renewcommand{\caption}[2][\relax]{% Make a new \caption
+{\raggedright\textbf{\ALG@name~\thealgorithm} ##2\par}
+\ifx\relax##1\relax
+\addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##2}%
+\else
+\addcontentsline{loa}{algorithm}{\protect\numberline{\thealgorithm}##1}%
+\fi
+\kern2pt\hrule\kern2pt
+}
+}{% \end{breakablealgorithm}
+\kern2pt\hrule\relax% \@fs@post for \@fs@ruled
+\end{center} %
+}
+\makeatother
+
 \begin{document}
 	
 \title{
@@ -93,7 +115,7 @@ connected to the entire leg assembly, controls the rotation around x axis. The r
 
 The following algorithm takes the angle of three motors as input and computes the position of the end-effector.
 
-\begin{algorithm}[H]
+\begin{breakablealgorithm}
 	\caption{Compute Leg End-Point}
 	\begin{algorithmic}[1]
 			\Require Motor angles $\theta_0, \theta_1, \theta_5$
@@ -131,7 +153,7 @@ The following algorithm takes the angle of three motors as input and computes th
 			$$
 			\State \Return $p_e$
 	\end{algorithmic}
-\end{algorithm}
+\end{breakablealgorithm}
 
 \section{Inverse Kinematics}
 
@@ -143,7 +165,7 @@ due to the complexity of the joint movements.
 Therefore we need the following algorithm 
 to compute the angles of the motor corresponding to a given target position.
 
-\begin{algorithm}[H]
+\begin{breakablealgorithm}
 	\caption{Compute Joint Angles from End-Point}
 	\begin{algorithmic}[1]
 			\Require End-point position $(x, y, z)$
@@ -196,7 +218,7 @@ to compute the angles of the motor corresponding to a given target position.
 			$$
 			\State \Return $(\theta_0, \theta_1, \theta_5)$
 	\end{algorithmic}
-\end{algorithm}
+\end{breakablealgorithm}
 
 \section{Differential Kinematics}
 
@@ -437,6 +459,15 @@ The RL problem is defined as follows:
     Key goals include maintaining forward speed (\(0.5 \, \text{m/s}\)), height (\(0.2 \, \text{m}\)), and reduce the body orientation change during moving.
     \item \textbf{Termination}: Episode ends if roll or pitch exceeds \(45^\circ\), height drops below \(0.1 \, \text{m}\), or 4500 steps are reached.
 \end{itemize}
+
+\subsection{System Design}
+
+\begin{figure}[H]
+  \centering
+	\includegraphics[width=0.9\linewidth]{../../assets/system_diagram.pdf}
+  \caption{System Block Diagram}
+  \label{fig:system}
+\end{figure}
 
 \subsection{Training Process}
 
