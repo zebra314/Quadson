@@ -464,7 +464,7 @@ The RL problem is defined as follows:
 
 \begin{figure}[H]
   \centering
-	\includegraphics[width=0.9\linewidth]{../../assets/system_diagram.pdf}
+	\includegraphics[width=0.9\linewidth]{../../assets/rl_agent_block_diagram.txt.pdf}
   \caption{System Block Diagram}
   \label{fig:system}
 \end{figure}
@@ -551,5 +551,36 @@ These steps will transition Quadson from simulation to a functional real-world r
 We developed a kinematic framework for Quadson, covering forward, inverse, differential, and body kinematics, alongside locomotion control. These algorithms were validated in Pybullet, where simulations confirmed accurate end-effector positioning and velocity tracking. 
 To enhance stability, we initiated deep reinforcement learning with PPO to adjust gait offsets, with training ongoing. Despite Pybullet's limitation with closed-chain mechanisms, we adapted by controlling link positions directly. This work establishes Quadson as a platform for robotic motion studies, 
 blending classical kinematics with Deep RL. The next step is real-world deployment, building on this foundation to achieve practical functionality.
+
+\newpage
+\section*{Division of Work}
+
+\renewcommand{\arraystretch}{1.8}
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|p{8cm}|p{3cm}|}
+\hline
+\textbf{Name} & \textbf{Responsibilities} & \textbf{Signature} \\ 
+\hline
+\textbf{Ying-Pei Lin} & System Design, Kinematics Derivation, Locomotion Algorithm Design, Model Training & \\
+\hline
+\end{tabular}
+\end{table}
+
+\section*{Supervisor Signature}
+\vspace{1cm}
+
+\noindent
+\textbf{Name:} \rule{10cm}{0.4pt}
+
+\vspace{1cm}
+
+\noindent
+\textbf{Signature:} \rule{10cm}{0.4pt}
+
+\vspace{1cm}
+
+\noindent
+\textbf{Date:} \rule{10cm}{0.4pt}
 
 \end{document}
